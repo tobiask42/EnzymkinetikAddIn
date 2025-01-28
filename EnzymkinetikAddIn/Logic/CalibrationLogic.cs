@@ -65,7 +65,7 @@ namespace EnzymkinetikAddIn.Logic
                 }
                 else
                 {
-                    // Falls ungültige Eingaben vorliegen, setzen wir den Wert auf null
+                    // Falls ungültige Eingaben vorliegen, wird der Wert auf Null gesetzt
                     row.Cells["average"].Value = null;
                 }
             }
@@ -87,7 +87,7 @@ namespace EnzymkinetikAddIn.Logic
                 }
                 else
                 {
-                    // Falls ungültige Eingaben vorliegen, setzen wir den Wert auf null
+                    // Falls ungültige Eingaben vorliegen, wird der Wert auf Null gesetzt
                     row.Cells["undiluted"].Value = null;
                 }
             }
