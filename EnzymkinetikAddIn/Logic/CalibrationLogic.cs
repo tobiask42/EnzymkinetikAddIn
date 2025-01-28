@@ -16,8 +16,6 @@ namespace EnzymkinetikAddIn.Logic
         public void ConfigureColumns(DataGridView dataGridView)
         {
             var columnManager = new ColumnManager(dataGridView);
-
-            columnManager.InitializeTimeColumn();
             columnManager.InitializeIntCol("dilution", "Verdünnung");
             columnManager.InitializeDoubleCol("reading_1", "Messwert 1");
             columnManager.InitializeDoubleCol("reading_2", "Messwert 2");
