@@ -204,10 +204,5 @@ namespace EnzymkinetikAddIn.Forms
         {
             return dataGridViewInputData;
         }
-
-        public void setDataGridView(DataGridView dataGridViewInputData)
-        {
-            this.dataGridViewInputData = dataGridViewInputData;
-        }
     }
 }
