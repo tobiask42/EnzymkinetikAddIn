@@ -110,6 +110,10 @@ namespace EnzymkinetikAddIn.Utilities
                 HeaderText = header,
                 ValueType = typeof(double),
                 ReadOnly = readOnly,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Format = "F2" // Format für 2 Nachkommastellen
+                }
             };
             _grid.Columns.Add(doubleColumn);
 
