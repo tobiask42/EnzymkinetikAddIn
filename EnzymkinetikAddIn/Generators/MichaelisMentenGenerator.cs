@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EnzymkinetikAddIn.Forms;
 using EnzymkinetikAddIn.Interfaces;
+using EnzymkinetikAddIn.Logic;
 
 namespace EnzymkinetikAddIn.Generators
 {
@@ -12,7 +13,17 @@ namespace EnzymkinetikAddIn.Generators
     {
         public BaseModelForm GenerateForm()
         {
-            throw new NotImplementedException();
+            // Erstellt ein neues Formular
+            BaseModelForm form = new BaseModelForm();
+
+            MichaelisMentenLogic mentenLogic = new MichaelisMentenLogic();
+
+            // Zugriff auf das DataGridView des Formulars
+            var dataGridView = form.GetDataGridView();
+
+            mentenLogic.ConfigureColumns(dataGridView);
+
+            return form;
         }
     }
 }
