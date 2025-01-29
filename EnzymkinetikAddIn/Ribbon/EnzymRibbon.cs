@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using EnzymkinetikAddIn.Data;
 using EnzymkinetikAddIn.Factories;
 using EnzymkinetikAddIn.Forms;
 using EnzymkinetikAddIn.Interfaces;
@@ -17,6 +18,8 @@ namespace EnzymkinetikAddIn.Ribbon
 
         private void EnzymRibbon_Load(object sender, RibbonUIEventArgs e)
         {
+            EnzymkinetikAddIn.Data.DatabaseHelper.GetConnection().Dispose();
+
             _formFactory = new FormFactory();
 
             foreach (var model_name in _formFactory.GetAvailableModels())
