@@ -363,7 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 # Jupyter Notebook
-.ipynb
+*.ipynb
 
 # Database
 enzymkinetik.db
