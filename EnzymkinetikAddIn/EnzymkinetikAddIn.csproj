@@ -186,6 +186,8 @@
   -->
   <ItemGroup>
     <Compile Include="Constants\ModelConstants.cs" />
+    <Compile Include="Data\DatabaseHelper.cs" />
+    <Compile Include="Data\ExperimentRepository.cs" />
     <Compile Include="Factories\FormFactory.cs" />
     <Compile Include="Forms\BaseModelForm.cs">
       <SubType>Form</SubType>
