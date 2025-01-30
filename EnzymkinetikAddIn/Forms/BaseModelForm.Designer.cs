@@ -31,6 +31,8 @@
             this.dataGridViewInputData = new System.Windows.Forms.DataGridView();
             this.labelTimeUnit = new System.Windows.Forms.Label();
             this.comboBoxTimeUnit = new System.Windows.Forms.ComboBox();
+            this.nameTextBox = new System.Windows.Forms.TextBox();
+            this.saveButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewInputData)).BeginInit();
             this.SuspendLayout();
             // 
@@ -66,11 +68,30 @@
             this.comboBoxTimeUnit.TabIndex = 2;
             this.comboBoxTimeUnit.SelectedIndexChanged += new System.EventHandler(this.comboBoxTimeUnit_SelectedIndexChanged);
             // 
+            // nameTextBox
+            // 
+            this.nameTextBox.Location = new System.Drawing.Point(496, 402);
+            this.nameTextBox.Name = "nameTextBox";
+            this.nameTextBox.Size = new System.Drawing.Size(100, 20);
+            this.nameTextBox.TabIndex = 3;
+            // 
+            // saveButton
+            // 
+            this.saveButton.Location = new System.Drawing.Point(660, 402);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(75, 23);
+            this.saveButton.TabIndex = 4;
+            this.saveButton.Text = "Speichern";
+            this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            // 
             // BaseModelForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.saveButton);
+            this.Controls.Add(this.nameTextBox);
             this.Controls.Add(this.comboBoxTimeUnit);
             this.Controls.Add(this.labelTimeUnit);
             this.Controls.Add(this.dataGridViewInputData);
@@ -88,5 +109,7 @@
         private System.Windows.Forms.DataGridView dataGridViewInputData;
         private System.Windows.Forms.Label labelTimeUnit;
         private System.Windows.Forms.ComboBox comboBoxTimeUnit;
+        private System.Windows.Forms.TextBox nameTextBox;
+        private System.Windows.Forms.Button saveButton;
     }
 }

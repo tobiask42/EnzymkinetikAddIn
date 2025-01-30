@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EnzymkinetikAddIn.Data;
 using EnzymkinetikAddIn.Interfaces;
 using EnzymkinetikAddIn.Utilities;
 
@@ -203,6 +204,34 @@ namespace EnzymkinetikAddIn.Forms
         public DataGridView GetDataGridView()
         {
             return dataGridViewInputData;
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(nameTextBox.Text))
+            {
+                MessageBox.Show("Bitte Namen für die Tabelle eingeben.", "Fehlender Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                nameTextBox.Focus();
+                return; // Früher Abbruch -> kein unnötiger Code
+            }
+
+            try
+            {
+                string tablename = nameTextBox.Text.Trim();
+                DatabaseHelper.SaveDataGridViewToDatabase(dataGridViewInputData, tablename);
+
+                var result = MessageBox.Show("Daten wurden gespeichert. Fenster schließen?", "Speichern erfolgreich",
+                                             MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
+                {
+                    this.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Speichern: {ex.Message}", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
