@@ -15,34 +15,34 @@ namespace EnzymkinetikAddIn.Factories
 
         public FormFactory()
         {
-            foreach (var model in ModelConstants.Models)
-            {
-                RegisterModel(model.Key, model.Value.GeneratorClass, model.Value.LogicClass);
-            }
+            //foreach (var model in ModelConstants.Models)
+            //{
+            //    RegisterModel(model.Key, model.Value.GeneratorClass, model.Value.LogicClass);
+            //}
         }
 
 
-        private void RegisterModel(string modelName, string generatorClassName, string logicClassName)
-        {
-            var generatorType = Type.GetType(generatorClassName);
-            var logicType = Type.GetType(logicClassName);
+        //private void RegisterModel(string modelName, string generatorClassName, string logicClassName)
+        //{
+        //    var generatorType = Type.GetType(generatorClassName);
+        //    var logicType = Type.GetType(logicClassName);
 
-            if (generatorType == null || logicType == null)
-            {
-                throw new InvalidOperationException($"Typen für Modell '{modelName}' nicht gefunden. Generator: {generatorClassName}, Logik: {logicClassName}");
-            }
+        //    if (generatorType == null || logicType == null)
+        //    {
+        //        throw new InvalidOperationException($"Typen für Modell '{modelName}' nicht gefunden. Generator: {generatorClassName}, Logik: {logicClassName}");
+        //    }
 
-            var generator = Activator.CreateInstance(generatorType) as IFormGenerator;
-            var logic = Activator.CreateInstance(logicType) as IModelLogic;
+        //    var generator = Activator.CreateInstance(generatorType) as IFormGenerator;
+        //    var logic = Activator.CreateInstance(logicType) as IModelLogic;
 
-            if (generator == null || logic == null)
-            {
-                throw new InvalidOperationException($"Fehler beim Erstellen von Instanzen für '{modelName}'.");
-            }
+        //    if (generator == null || logic == null)
+        //    {
+        //        throw new InvalidOperationException($"Fehler beim Erstellen von Instanzen für '{modelName}'.");
+        //    }
 
-            _generators[modelName] = generator;
-            _logics[modelName] = logic;
-        }
+        //    _generators[modelName] = generator;
+        //    _logics[modelName] = logic;
+        //}
 
 
 
