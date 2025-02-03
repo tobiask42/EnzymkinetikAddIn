@@ -114,5 +114,26 @@ namespace EnzymkinetikAddIn.Data
 
             return tableName;
         }
+        public static List<string> GetTableNames()
+        {
+            List<string> tableNames = new List<string>();
+
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string query = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'";
+
+                using (var cmd = new SQLiteCommand(query, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tableNames.Add(reader.GetString(0)); // Spaltenindex 0 enthält den Tabellennamen
+                    }
+                }
+            }
+
+            return tableNames;
+        }
     }
 }
