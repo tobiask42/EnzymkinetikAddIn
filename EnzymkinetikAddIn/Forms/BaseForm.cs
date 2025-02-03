@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using EnzymkinetikAddIn.Data;
 using EnzymkinetikAddIn.Interfaces;
+using EnzymkinetikAddIn.Ribbon;
 using EnzymkinetikAddIn.Utilities;
 
 namespace EnzymkinetikAddIn.Forms
@@ -17,12 +18,13 @@ namespace EnzymkinetikAddIn.Forms
     /// <summary>
     /// Generisches Formular für die Eingabe von Daten. Automatische Probennummerierung und Zeitangabe.
     /// </summary>
-    public partial class BaseModelForm : Form
+    public partial class BaseForm : Form
     {
         private string CurrentTimeUnit = "h"; // Standard: Stunden
+        private EnzymRibbon _ribbon;
 
         private ComboBoxManager _comboBoxManager;
-        public BaseModelForm()
+        public BaseForm()
         {
             InitializeComponent();
             DataGridViewTextBoxColumn sampleColum = new DataGridViewTextBoxColumn
@@ -225,6 +227,7 @@ namespace EnzymkinetikAddIn.Forms
 
                 if (result == DialogResult.Yes)
                 {
+                    _ribbon?.LoadDataEntries();
                     this.Close();
                 }
             }
@@ -232,6 +235,11 @@ namespace EnzymkinetikAddIn.Forms
             {
                 MessageBox.Show($"Fehler beim Speichern: {ex.Message}", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        public void SetRibbonReference(EnzymRibbon ribbon)
+        {
+            _ribbon = ribbon;
         }
     }
 }

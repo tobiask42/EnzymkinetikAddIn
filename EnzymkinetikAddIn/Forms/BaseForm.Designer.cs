@@ -1,6 +1,6 @@
 ﻿namespace EnzymkinetikAddIn.Forms
 {
-    partial class BaseModelForm
+    partial class BaseForm
     {
         /// <summary>
         /// Required designer variable.
