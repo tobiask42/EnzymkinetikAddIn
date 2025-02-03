@@ -117,30 +117,48 @@ namespace EnzymkinetikAddIn.Utilities
             };
             _grid.Columns.Add(doubleColumn);
 
-            // Binde das Event "EditingControlShowing", um den Event-Handler für die Double-Validierung hinzuzufügen
-            _grid.EditingControlShowing += (sender, e) =>
-            {
-                if (_grid.CurrentCell?.OwningColumn?.Name == name && e.Control is TextBox textBox)
-                {
-                    // Entferne alte Event-Handler, um doppelte Registrierungen zu vermeiden
-                    textBox.KeyPress -= DoubleColumnKeyPressHandler;
-
-                    // Füge neuen Event-Handler hinzu
-                    textBox.KeyPress += DoubleColumnKeyPressHandler;
-                }
-            };
+            // Sicherstellen, dass der Event-Handler nur einmal registriert wird
+            _grid.EditingControlShowing -= Grid_EditingControlShowing;
+            _grid.EditingControlShowing += Grid_EditingControlShowing;
 
             return this;
         }
+
+        // Event-Handler für die Bearbeitung der Spalten
+        private void Grid_EditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            if (e.Control is TextBox editingTextBox)
+            {
+                // Falls die aktuelle Zelle eine Double-Spalte ist
+                if (_grid.CurrentCell?.OwningColumn?.ValueType == typeof(double))
+                {
+                    editingTextBox.KeyPress -= DoubleColumnKeyPressHandler; // Vorherige Event-Handler entfernen
+                    editingTextBox.KeyPress += DoubleColumnKeyPressHandler; // Neuen hinzufügen
+                }
+                else
+                {
+                    editingTextBox.KeyPress -= DoubleColumnKeyPressHandler; // Sicherstellen, dass der Event-Handler entfernt wird
+                }
+            }
+        }
+
 
         // Event-Handler für die Double-Validierung
         private void DoubleColumnKeyPressHandler(object sender, KeyPressEventArgs e)
         {
             if (sender is TextBox textBox)
             {
-                // Validierung der Eingabe
-                e.Handled = !ValidationHelper.IsValidDoubleInput(textBox, e.KeyChar);
+                // Sicherstellen, dass die aktuelle Zelle eine Double-Spalte ist
+                if (_grid.CurrentCell?.OwningColumn?.ValueType == typeof(double))
+                {
+                    e.Handled = !ValidationHelper.IsValidDoubleInput(textBox, e.KeyChar);
+                }
+                else
+                {
+                    e.Handled = false; // Falls es keine Double-Spalte ist, keine Einschränkung anwenden
+                }
             }
         }
+
     }
 }
