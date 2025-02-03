@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,16 +9,17 @@ namespace EnzymkinetikAddIn.Constants
 {
     internal class ModelConstants
     {
-        public static readonly Dictionary<string, (string GeneratorClass, string LogicClass)> Models;
+        // Liste der Modellnamen
+        public static readonly List<string> Models;
 
         static ModelConstants()
         {
-            Models = new Dictionary<string, (string, string)>
-        {
-            { "Kalibriergerade", ("EnzymkinetikAddIn.Generators.CalibrationFormGenerator", "EnzymkinetikAddIn.Logic.CalibrationLogic") },
-            { "Michaelis-Menten", ("EnzymkinetikAddIn.Generators.MichaelisMentenGenerator", "EnzymkinetikAddIn.Logic.MichaelisMentenLogic") },
-            { "Lineweaver-Burk", ("EnzymkinetikAddIn.Generators.LineweaverBurkGenerator", "EnzymkinetikAddIn.Logic.LineweaverBurkLogic") }
-        };
+            // Initialisierung der Liste der Modelle
+            Models = new List<string>
+            {
+                "Michaelis-Menten",
+                "Lineweaver-Burk"
+            };
         }
     }
 }
