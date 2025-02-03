@@ -37,85 +37,102 @@ namespace EnzymkinetikAddIn.Ribbon
         private void InitializeComponent()
         {
             this.tab1 = this.Factory.CreateRibbonTab();
+            this.group1 = this.Factory.CreateRibbonGroup();
+            this.group2 = this.Factory.CreateRibbonGroup();
             this.group3 = this.Factory.CreateRibbonGroup();
-            this.comboBoxEnzyme = this.Factory.CreateRibbonComboBox();
-            this.comboBoxSubstrate = this.Factory.CreateRibbonComboBox();
-            this.group4 = this.Factory.CreateRibbonGroup();
-            this.comboBoxDataSet = this.Factory.CreateRibbonComboBox();
-            this.comboBoxModelSelection = this.Factory.CreateRibbonComboBox();
-            this.group5 = this.Factory.CreateRibbonGroup();
-            this.comboBoxOrientation = this.Factory.CreateRibbonComboBox();
             this.checkBoxSeparate = this.Factory.CreateRibbonCheckBox();
+            this.buttonOpenInputForm = this.Factory.CreateRibbonButton();
+            this.buttonEditData = this.Factory.CreateRibbonButton();
+            this.buttonGenerateResult = this.Factory.CreateRibbonButton();
+            this.dropDownConcentrations = this.Factory.CreateRibbonDropDown();
+            this.dropDownUnit = this.Factory.CreateRibbonDropDown();
+            this.dropDownDataSet = this.Factory.CreateRibbonDropDown();
+            this.dropDownModel = this.Factory.CreateRibbonDropDown();
+            this.dropDownOrientation = this.Factory.CreateRibbonDropDown();
             this.tab1.SuspendLayout();
+            this.group1.SuspendLayout();
+            this.group2.SuspendLayout();
             this.group3.SuspendLayout();
-            this.group4.SuspendLayout();
-            this.group5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tab1
             // 
             this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
+            this.tab1.Groups.Add(this.group1);
+            this.tab1.Groups.Add(this.group2);
             this.tab1.Groups.Add(this.group3);
-            this.tab1.Groups.Add(this.group4);
-            this.tab1.Groups.Add(this.group5);
             this.tab1.Label = "Enzymkinetik";
             this.tab1.Name = "tab1";
             // 
+            // group1
+            // 
+            this.group1.Items.Add(this.dropDownConcentrations);
+            this.group1.Items.Add(this.dropDownUnit);
+            this.group1.Items.Add(this.buttonOpenInputForm);
+            this.group1.Label = "group1";
+            this.group1.Name = "group1";
+            // 
+            // group2
+            // 
+            this.group2.Items.Add(this.dropDownDataSet);
+            this.group2.Items.Add(this.dropDownModel);
+            this.group2.Items.Add(this.buttonEditData);
+            this.group2.Label = "group2";
+            this.group2.Name = "group2";
+            // 
             // group3
             // 
-            this.group3.Items.Add(this.comboBoxEnzyme);
-            this.group3.Items.Add(this.comboBoxSubstrate);
+            this.group3.Items.Add(this.dropDownOrientation);
+            this.group3.Items.Add(this.checkBoxSeparate);
+            this.group3.Items.Add(this.buttonGenerateResult);
             this.group3.Label = "group3";
             this.group3.Name = "group3";
-            // 
-            // comboBoxEnzyme
-            // 
-            this.comboBoxEnzyme.Label = "Enzymonzentrationen";
-            this.comboBoxEnzyme.Name = "comboBoxEnzyme";
-            this.comboBoxEnzyme.Text = null;
-            // 
-            // comboBoxSubstrate
-            // 
-            this.comboBoxSubstrate.Label = "Substratkonzentrationen";
-            this.comboBoxSubstrate.Name = "comboBoxSubstrate";
-            this.comboBoxSubstrate.Text = null;
-            // 
-            // group4
-            // 
-            this.group4.Items.Add(this.comboBoxDataSet);
-            this.group4.Items.Add(this.comboBoxModelSelection);
-            this.group4.Label = "group4";
-            this.group4.Name = "group4";
-            // 
-            // comboBoxDataSet
-            // 
-            this.comboBoxDataSet.Label = "Datensatz";
-            this.comboBoxDataSet.Name = "comboBoxDataSet";
-            this.comboBoxDataSet.Text = null;
-            // 
-            // comboBoxModelSelection
-            // 
-            this.comboBoxModelSelection.Label = "Modell";
-            this.comboBoxModelSelection.Name = "comboBoxModelSelection";
-            this.comboBoxModelSelection.Text = null;
-            // 
-            // group5
-            // 
-            this.group5.Items.Add(this.comboBoxOrientation);
-            this.group5.Items.Add(this.checkBoxSeparate);
-            this.group5.Label = "group5";
-            this.group5.Name = "group5";
-            // 
-            // comboBoxOrientation
-            // 
-            this.comboBoxOrientation.Label = "Ausrichtung";
-            this.comboBoxOrientation.Name = "comboBoxOrientation";
-            this.comboBoxOrientation.Text = null;
             // 
             // checkBoxSeparate
             // 
             this.checkBoxSeparate.Label = "Tabellen auftrennen";
             this.checkBoxSeparate.Name = "checkBoxSeparate";
+            // 
+            // buttonOpenInputForm
+            // 
+            this.buttonOpenInputForm.Label = "Datensatz erstellen";
+            this.buttonOpenInputForm.Name = "buttonOpenInputForm";
+            this.buttonOpenInputForm.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonOpenInputForm_Click);
+            // 
+            // buttonEditData
+            // 
+            this.buttonEditData.Label = "Datensatz Bearbeiten";
+            this.buttonEditData.Name = "buttonEditData";
+            // 
+            // buttonGenerateResult
+            // 
+            this.buttonGenerateResult.Label = "Tabellen Generieren";
+            this.buttonGenerateResult.Name = "buttonGenerateResult";
+            // 
+            // dropDownConcentrations
+            // 
+            this.dropDownConcentrations.Label = "Konzentrationen";
+            this.dropDownConcentrations.Name = "dropDownConcentrations";
+            // 
+            // dropDownUnit
+            // 
+            this.dropDownUnit.Label = "Einheit";
+            this.dropDownUnit.Name = "dropDownUnit";
+            // 
+            // dropDownDataSet
+            // 
+            this.dropDownDataSet.Label = "Datensatz";
+            this.dropDownDataSet.Name = "dropDownDataSet";
+            // 
+            // dropDownModel
+            // 
+            this.dropDownModel.Label = "Modell";
+            this.dropDownModel.Name = "dropDownModel";
+            // 
+            // dropDownOrientation
+            // 
+            this.dropDownOrientation.Label = "Ausrichtung";
+            this.dropDownOrientation.Name = "dropDownOrientation";
             // 
             // EnzymRibbon
             // 
@@ -125,12 +142,12 @@ namespace EnzymkinetikAddIn.Ribbon
             this.Load += new Microsoft.Office.Tools.Ribbon.RibbonUIEventHandler(this.EnzymRibbon_Load);
             this.tab1.ResumeLayout(false);
             this.tab1.PerformLayout();
+            this.group1.ResumeLayout(false);
+            this.group1.PerformLayout();
+            this.group2.ResumeLayout(false);
+            this.group2.PerformLayout();
             this.group3.ResumeLayout(false);
             this.group3.PerformLayout();
-            this.group4.ResumeLayout(false);
-            this.group4.PerformLayout();
-            this.group5.ResumeLayout(false);
-            this.group5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -138,15 +155,18 @@ namespace EnzymkinetikAddIn.Ribbon
         #endregion
 
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group2;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group3;
-        internal Microsoft.Office.Tools.Ribbon.RibbonComboBox comboBoxEnzyme;
-        internal Microsoft.Office.Tools.Ribbon.RibbonComboBox comboBoxSubstrate;
-        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group4;
-        internal Microsoft.Office.Tools.Ribbon.RibbonComboBox comboBoxDataSet;
-        internal Microsoft.Office.Tools.Ribbon.RibbonComboBox comboBoxModelSelection;
-        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group5;
-        internal Microsoft.Office.Tools.Ribbon.RibbonComboBox comboBoxOrientation;
         internal Microsoft.Office.Tools.Ribbon.RibbonCheckBox checkBoxSeparate;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonOpenInputForm;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonEditData;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonGenerateResult;
+        internal Microsoft.Office.Tools.Ribbon.RibbonDropDown dropDownConcentrations;
+        internal Microsoft.Office.Tools.Ribbon.RibbonDropDown dropDownDataSet;
+        internal Microsoft.Office.Tools.Ribbon.RibbonDropDown dropDownModel;
+        internal Microsoft.Office.Tools.Ribbon.RibbonDropDown dropDownOrientation;
+        internal Microsoft.Office.Tools.Ribbon.RibbonDropDown dropDownUnit;
     }
 
     partial class ThisRibbonCollection
