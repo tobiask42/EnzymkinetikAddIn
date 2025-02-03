@@ -233,21 +233,16 @@
     <Compile Include="Data\DatabaseHelper.cs" />
     <Compile Include="Data\ExperimentRepository.cs" />
     <Compile Include="Factories\FormFactory.cs" />
-    <Compile Include="Forms\BaseModelForm.cs">
+    <Compile Include="Forms\BaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\BaseModelForm.Designer.cs">
-      <DependentUpon>BaseModelForm.cs</DependentUpon>
+    <Compile Include="Forms\BaseForm.Designer.cs">
+      <DependentUpon>BaseForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Generators\CalibrationFormGenerator.cs" />
-    <Compile Include="Generators\LineweaverBurkGenerator.cs" />
-    <Compile Include="Generators\MichaelisMentenGenerator.cs" />
+    <Compile Include="Generators\DataSetGenerator.cs" />
     <Compile Include="Interfaces\IExperimentData.cs" />
     <Compile Include="Interfaces\IFormGenerator.cs" />
     <Compile Include="Interfaces\IModelLogic.cs" />
-    <Compile Include="Logic\CalibrationLogic.cs" />
-    <Compile Include="Logic\LineweaverBurkLogic.cs" />
-    <Compile Include="Logic\MichaelisMentenLogic.cs" />
     <Compile Include="Models\CalibrationData.cs" />
     <Compile Include="Models\MichaelisMentenData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -259,8 +254,8 @@
     <Compile Include="Utilities\ColumnManager.cs" />
     <Compile Include="Utilities\TimeConverter.cs" />
     <Compile Include="Utilities\ValidationHelper.cs" />
-    <EmbeddedResource Include="Forms\BaseModelForm.resx">
-      <DependentUpon>BaseModelForm.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\BaseForm.resx">
+      <DependentUpon>BaseForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -302,7 +297,9 @@
     </Compile>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Logic\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
