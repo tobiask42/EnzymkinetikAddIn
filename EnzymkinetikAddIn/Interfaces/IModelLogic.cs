@@ -9,7 +9,5 @@ namespace EnzymkinetikAddIn.Interfaces
 {
     internal interface IModelLogic
     {
-        void ConfigureColumns(DataGridView dataGridView);
-        void PerformCalculations(DataGridView dataGridView);
     }
 }
