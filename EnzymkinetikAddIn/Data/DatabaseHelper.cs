@@ -46,16 +46,15 @@ namespace EnzymkinetikAddIn.Data
             {
                 conn.Open();
 
-                // Einen eindeutigen Tabellennamen generieren
                 string tableName = GetUniqueTableName(conn, baseTableName);
 
                 using (var transaction = conn.BeginTransaction())
                 {
                     try
                     {
-                        // Tabelle erstellen
+                        // Bestimme die Datentypen basierend auf den Spalten
                         var columnDefinitions = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>()
-                            .Select(c => $"[{c.Name}] TEXT")); // Alle Spalten als TEXT speichern
+                            .Select(c => $"[{c.Name}] {GetSqlType(c.ValueType)}"));
 
                         string createTableQuery = $"CREATE TABLE {tableName} (ID INTEGER PRIMARY KEY AUTOINCREMENT, {columnDefinitions})";
                         using (var cmd = new SQLiteCommand(createTableQuery, conn))
@@ -66,7 +65,7 @@ namespace EnzymkinetikAddIn.Data
                         // Daten einfügen
                         foreach (DataGridViewRow row in dgv.Rows)
                         {
-                            if (row.IsNewRow) continue; // Leere letzte Zeile ignorieren
+                            if (row.IsNewRow) continue;
 
                             var columnNames = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>().Select(c => $"[{c.Name}]"));
                             var values = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>().Select(_ => "?"));
@@ -77,7 +76,8 @@ namespace EnzymkinetikAddIn.Data
                             {
                                 foreach (DataGridViewColumn col in dgv.Columns)
                                 {
-                                    cmd.Parameters.AddWithValue($"@{col.Name}", row.Cells[col.Index].Value?.ToString() ?? DBNull.Value.ToString());
+                                    object value = row.Cells[col.Index].Value ?? DBNull.Value;
+                                    cmd.Parameters.AddWithValue($"@{col.Name}", ConvertToSqlValue(value));
                                 }
                                 cmd.ExecuteNonQuery();
                             }
@@ -94,6 +94,7 @@ namespace EnzymkinetikAddIn.Data
                 }
             }
         }
+
 
         public static string GetUniqueTableName(SQLiteConnection conn, string baseName)
         {
@@ -135,5 +136,28 @@ namespace EnzymkinetikAddIn.Data
 
             return tableNames;
         }
+
+        private static string GetSqlType(Type type)
+        {
+            if (type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(byte))
+                return "INTEGER";
+            if (type == typeof(float) || type == typeof(double) || type == typeof(decimal))
+                return "REAL";
+            if (type == typeof(bool))
+                return "BOOLEAN";
+            if (type == typeof(DateTime))
+                return "TEXT"; // SQLite speichert Datumswerte als TEXT im ISO 8601-Format
+            return "TEXT"; // Standardmäßig als TEXT speichern
+        }
+
+        private static object ConvertToSqlValue(object value)
+        {
+            if (value is bool boolVal)
+                return boolVal ? 1 : 0; // SQLite speichert BOOLEAN als INTEGER (0/1)
+            if (value is DateTime dateVal)
+                return dateVal.ToString("yyyy-MM-dd HH:mm:ss"); // Einheitliches ISO 8601-Format für Datumswerte
+            return value; // Alle anderen Werte unverändert lassen
+        }
+
     }
 }
