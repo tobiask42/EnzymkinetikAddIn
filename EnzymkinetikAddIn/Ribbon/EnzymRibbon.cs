@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using EnzymkinetikAddIn.Constants;
 using EnzymkinetikAddIn.Data;
 using EnzymkinetikAddIn.Factories;
 using EnzymkinetikAddIn.Forms;
 using EnzymkinetikAddIn.Interfaces;
-using EnzymkinetikAddIn.Models;
 using Microsoft.Office.Tools;
 using Microsoft.Office.Tools.Ribbon;
 
@@ -98,6 +98,21 @@ namespace EnzymkinetikAddIn.Ribbon
             string concentration = dropDownConcentrations.SelectedItem.Label;
             string unit = dropDownUnit.SelectedItem.Label;
             var form = _formFactory.CreateForm(concentration, unit);
+
+            form.SetRibbonReference(this);
+            form.ShowDialog();
+        }
+
+        private void buttonEditData_Click(object sender, RibbonControlEventArgs e)
+        {
+            if (dropDownDataSet.SelectedItem == null)
+            {
+                MessageBox.Show("Bitte eine Tabelle auswählen.", "Hinweis", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string tableName = dropDownDataSet.SelectedItem.Label;
+            var form = _formFactory.CreateEditForm(tableName);
 
             form.SetRibbonReference(this);
             form.ShowDialog();

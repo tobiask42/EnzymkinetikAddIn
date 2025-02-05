@@ -231,7 +231,6 @@
   <ItemGroup>
     <Compile Include="Constants\ModelConstants.cs" />
     <Compile Include="Data\DatabaseHelper.cs" />
-    <Compile Include="Data\ExperimentRepository.cs" />
     <Compile Include="Factories\FormFactory.cs" />
     <Compile Include="Forms\BaseForm.cs">
       <SubType>Form</SubType>
@@ -243,8 +242,6 @@
     <Compile Include="Interfaces\IExperimentData.cs" />
     <Compile Include="Interfaces\IFormGenerator.cs" />
     <Compile Include="Interfaces\IModelLogic.cs" />
-    <Compile Include="Models\CalibrationData.cs" />
-    <Compile Include="Models\MichaelisMentenData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -299,6 +296,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Logic\" />
+    <Folder Include="Models\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

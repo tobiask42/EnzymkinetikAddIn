@@ -38,17 +38,17 @@ namespace EnzymkinetikAddIn.Ribbon
         {
             this.tab1 = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
-            this.group2 = this.Factory.CreateRibbonGroup();
-            this.group3 = this.Factory.CreateRibbonGroup();
-            this.checkBoxSeparate = this.Factory.CreateRibbonCheckBox();
-            this.buttonOpenInputForm = this.Factory.CreateRibbonButton();
-            this.buttonEditData = this.Factory.CreateRibbonButton();
-            this.buttonGenerateResult = this.Factory.CreateRibbonButton();
             this.dropDownConcentrations = this.Factory.CreateRibbonDropDown();
             this.dropDownUnit = this.Factory.CreateRibbonDropDown();
+            this.buttonOpenInputForm = this.Factory.CreateRibbonButton();
+            this.group2 = this.Factory.CreateRibbonGroup();
             this.dropDownDataSet = this.Factory.CreateRibbonDropDown();
             this.dropDownModel = this.Factory.CreateRibbonDropDown();
+            this.buttonEditData = this.Factory.CreateRibbonButton();
+            this.group3 = this.Factory.CreateRibbonGroup();
             this.dropDownOrientation = this.Factory.CreateRibbonDropDown();
+            this.checkBoxSeparate = this.Factory.CreateRibbonCheckBox();
+            this.buttonGenerateResult = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
@@ -72,43 +72,6 @@ namespace EnzymkinetikAddIn.Ribbon
             this.group1.Label = "group1";
             this.group1.Name = "group1";
             // 
-            // group2
-            // 
-            this.group2.Items.Add(this.dropDownDataSet);
-            this.group2.Items.Add(this.dropDownModel);
-            this.group2.Items.Add(this.buttonEditData);
-            this.group2.Label = "group2";
-            this.group2.Name = "group2";
-            // 
-            // group3
-            // 
-            this.group3.Items.Add(this.dropDownOrientation);
-            this.group3.Items.Add(this.checkBoxSeparate);
-            this.group3.Items.Add(this.buttonGenerateResult);
-            this.group3.Label = "group3";
-            this.group3.Name = "group3";
-            // 
-            // checkBoxSeparate
-            // 
-            this.checkBoxSeparate.Label = "Tabellen auftrennen";
-            this.checkBoxSeparate.Name = "checkBoxSeparate";
-            // 
-            // buttonOpenInputForm
-            // 
-            this.buttonOpenInputForm.Label = "Datensatz erstellen";
-            this.buttonOpenInputForm.Name = "buttonOpenInputForm";
-            this.buttonOpenInputForm.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonOpenInputForm_Click);
-            // 
-            // buttonEditData
-            // 
-            this.buttonEditData.Label = "Datensatz Bearbeiten";
-            this.buttonEditData.Name = "buttonEditData";
-            // 
-            // buttonGenerateResult
-            // 
-            this.buttonGenerateResult.Label = "Tabellen Generieren";
-            this.buttonGenerateResult.Name = "buttonGenerateResult";
-            // 
             // dropDownConcentrations
             // 
             this.dropDownConcentrations.Label = "Konzentrationen";
@@ -118,6 +81,20 @@ namespace EnzymkinetikAddIn.Ribbon
             // 
             this.dropDownUnit.Label = "Einheit";
             this.dropDownUnit.Name = "dropDownUnit";
+            // 
+            // buttonOpenInputForm
+            // 
+            this.buttonOpenInputForm.Label = "Datensatz erstellen";
+            this.buttonOpenInputForm.Name = "buttonOpenInputForm";
+            this.buttonOpenInputForm.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonOpenInputForm_Click);
+            // 
+            // group2
+            // 
+            this.group2.Items.Add(this.dropDownDataSet);
+            this.group2.Items.Add(this.dropDownModel);
+            this.group2.Items.Add(this.buttonEditData);
+            this.group2.Label = "group2";
+            this.group2.Name = "group2";
             // 
             // dropDownDataSet
             // 
@@ -129,10 +106,34 @@ namespace EnzymkinetikAddIn.Ribbon
             this.dropDownModel.Label = "Modell";
             this.dropDownModel.Name = "dropDownModel";
             // 
+            // buttonEditData
+            // 
+            this.buttonEditData.Label = "Datensatz Bearbeiten";
+            this.buttonEditData.Name = "buttonEditData";
+            this.buttonEditData.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonEditData_Click);
+            // 
+            // group3
+            // 
+            this.group3.Items.Add(this.dropDownOrientation);
+            this.group3.Items.Add(this.checkBoxSeparate);
+            this.group3.Items.Add(this.buttonGenerateResult);
+            this.group3.Label = "group3";
+            this.group3.Name = "group3";
+            // 
             // dropDownOrientation
             // 
             this.dropDownOrientation.Label = "Ausrichtung";
             this.dropDownOrientation.Name = "dropDownOrientation";
+            // 
+            // checkBoxSeparate
+            // 
+            this.checkBoxSeparate.Label = "Tabellen auftrennen";
+            this.checkBoxSeparate.Name = "checkBoxSeparate";
+            // 
+            // buttonGenerateResult
+            // 
+            this.buttonGenerateResult.Label = "Tabellen Generieren";
+            this.buttonGenerateResult.Name = "buttonGenerateResult";
             // 
             // EnzymRibbon
             // 
