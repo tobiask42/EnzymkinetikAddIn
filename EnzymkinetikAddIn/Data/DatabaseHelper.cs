@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.Windows.Forms;
+using System.Data;
 
 namespace EnzymkinetikAddIn.Data
 {
@@ -158,6 +159,62 @@ namespace EnzymkinetikAddIn.Data
                 return dateVal.ToString("yyyy-MM-dd HH:mm:ss"); // Einheitliches ISO 8601-Format für Datumswerte
             return value; // Alle anderen Werte unverändert lassen
         }
+        public static void LoadTableToDataGridView(DataGridView dgv, string tableName)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string query = $"SELECT * FROM [{tableName}]";
+
+                using (var cmd = new SQLiteCommand(query, conn))
+                using (var adapter = new SQLiteDataAdapter(cmd))
+                {
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    dgv.DataSource = dt;
+                }
+            }
+        }
+
+        public static DataTable LoadTable(string tableName)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                using (var cmd = new SQLiteCommand($"SELECT * FROM [{tableName}]", conn))
+                using (var adapter = new SQLiteDataAdapter(cmd))
+                {
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    return dt;
+                }
+            }
+        }
+
+        public static void SaveTable(DataTable dt, string tableName)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+
+                using (var transaction = conn.BeginTransaction())
+                {
+                    using (var adapter = new SQLiteDataAdapter($"SELECT * FROM [{tableName}]", conn))
+                    {
+                        var commandBuilder = new SQLiteCommandBuilder(adapter);
+                        adapter.UpdateCommand = commandBuilder.GetUpdateCommand();
+                        adapter.InsertCommand = commandBuilder.GetInsertCommand();
+                        adapter.DeleteCommand = commandBuilder.GetDeleteCommand();
+
+                        adapter.Update(dt);
+                    }
+
+                    transaction.Commit();
+                }
+            }
+        }
 
     }
+
+    
 }
