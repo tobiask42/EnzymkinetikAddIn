@@ -40,9 +40,9 @@ namespace EnzymkinetikAddIn.Generators
             columnManager.InitializeTimeColumn();
             for (int i = 1; i <= num_concentrations; i++)
             {
-                columnManager.InitializeIntCol("dilution", "c_" + i + "\nVerdünnung");
-                columnManager.InitializeDoubleCol("reading_1", "c_"+ i +"\nMesswert 1\n" + unit);
-                columnManager.InitializeDoubleCol("reading_2", "c_" + i + "\nMesswert 2\n" + unit);
+                columnManager.InitializeIntCol("dilution_" + i, "c_" + i + "\nVerdünnung");
+                columnManager.InitializeDoubleCol("reading_1_" + i, "c_"+ i +"\nMesswert 1\n" + unit);
+                columnManager.InitializeDoubleCol("reading_2_" + i, "c_" + i + "\nMesswert 2\n" + unit);
             }
             columnManager.InitializeBaseCol("comment", "Kommentar");
         }
