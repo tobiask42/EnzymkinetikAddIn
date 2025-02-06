@@ -75,7 +75,7 @@ namespace EnzymkinetikAddIn.Ribbon
             foreach (string tableName in tables)
             {
                 var item = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-                item.Label = tableName;
+                item.Label = tableName.Replace("_"," ");
                 dropDownDataSet.Items.Add(item);
             }
 
