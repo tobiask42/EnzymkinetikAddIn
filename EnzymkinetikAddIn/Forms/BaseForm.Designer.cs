@@ -74,6 +74,7 @@
             this.nameTextBox.Name = "nameTextBox";
             this.nameTextBox.Size = new System.Drawing.Size(100, 20);
             this.nameTextBox.TabIndex = 3;
+            this.nameTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.nameTextBox_KeyPress);
             // 
             // saveButton
             // 
@@ -85,7 +86,7 @@
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
-            // BaseModelForm
+            // BaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -95,7 +96,7 @@
             this.Controls.Add(this.comboBoxTimeUnit);
             this.Controls.Add(this.labelTimeUnit);
             this.Controls.Add(this.dataGridViewInputData);
-            this.Name = "BaseModelForm";
+            this.Name = "BaseForm";
             this.Text = "BaseModelForm";
             this.Load += new System.EventHandler(this.BaseModelForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewInputData)).EndInit();

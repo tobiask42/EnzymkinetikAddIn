@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EnzymkinetikAddIn.Data;
@@ -214,19 +215,20 @@ namespace EnzymkinetikAddIn.Forms
             {
                 MessageBox.Show("Bitte Namen für die Tabelle eingeben.", "Fehlender Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 nameTextBox.Focus();
-                return; // Früher Abbruch -> kein unnötiger Code
+                return;
             }
 
             try
             {
+
                 string tablename = nameTextBox.Text.Trim();
-                DatabaseHelper.SaveDataGridViewToDatabase(dataGridViewInputData, tablename);
+                tablename = Regex.Replace(tablename, @"\s+", "_");
 
-                var result = MessageBox.Show("Daten wurden gespeichert. Fenster schließen?", "Speichern erfolgreich",
-                                             MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
+                bool success = DatabaseHelper.SaveDataGridViewToDatabase(dataGridViewInputData, tablename);
+                tablename = DatabaseHelper.StorageName.Replace("_"," ");
+                if (success)
                 {
+                    MessageBox.Show("Daten wurden erfolgreich unter " + tablename + " gespeichert.", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     _ribbon?.LoadDataEntries();
                     this.Close();
                 }
@@ -237,9 +239,29 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
+
         public void SetRibbonReference(EnzymRibbon ribbon)
         {
             _ribbon = ribbon;
+        }
+
+        private void nameTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Verhindert, dass der Name mit einer Zahl oder einem Leerzeichen beginnt
+            if ((nameTextBox.TextLength == 0 && (char.IsDigit(e.KeyChar) || e.KeyChar == ' ')))
+            {
+                e.Handled = true;
+            }
+            // Erlaubt Buchstaben, Ziffern, Steuerzeichen (wie Backspace) und Leerzeichen
+            else if (char.IsLetterOrDigit(e.KeyChar) || char.IsControl(e.KeyChar) || e.KeyChar == ' ')
+            {
+                e.Handled = false;  // Zeichen zulassen
+            }
+            // Verhindert alle anderen Zeichen
+            else
+            {
+                e.Handled = true;  // Zeichen blockieren
+            }
         }
     }
 }
