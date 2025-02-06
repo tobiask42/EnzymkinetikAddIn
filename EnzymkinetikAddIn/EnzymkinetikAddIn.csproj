@@ -239,6 +239,7 @@
       <DependentUpon>BaseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Generators\DataSetGenerator.cs" />
+    <Compile Include="Generators\EditFormGenerator.cs" />
     <Compile Include="Interfaces\IExperimentData.cs" />
     <Compile Include="Interfaces\IFormGenerator.cs" />
     <Compile Include="Interfaces\IModelLogic.cs" />
