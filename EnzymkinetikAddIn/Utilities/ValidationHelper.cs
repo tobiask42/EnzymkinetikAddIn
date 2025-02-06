@@ -10,21 +10,26 @@ namespace EnzymkinetikAddIn.Utilities
         /// </summary>
         public static bool IsValidDoubleInput(TextBox textBox, char inputChar)
         {
-            // Steuerzeichen (Backspace, Delete etc.) zulassen
+            // Steuerzeichen (Backspace, Delete etc.) immer zulassen
             if (char.IsControl(inputChar))
                 return true;
 
-            // Prüfen ob das erste Zeichen ein Punkt, Komma ist
-            if ((inputChar == ',' || inputChar == '.') && string.IsNullOrEmpty(textBox.Text))
-                return false;
+            // Zahlen zulassen
+            if (char.IsDigit(inputChar))
+                return true;
 
-            // Prüfen, ob bereits ein Punkt oder Komma existiert
+            // Prüfen, ob bereits ein Punkt oder Komma vorhanden ist
             if ((inputChar == ',' || inputChar == '.') && (textBox.Text.Contains(",") || textBox.Text.Contains(".")))
                 return false;
 
-            // Nur Ziffern, Punkte oder Kommas zulassen
-            return char.IsDigit(inputChar) || inputChar == ',' || inputChar == '.';
+            // Punkt oder Komma als erste Eingabe verbieten
+            if ((inputChar == ',' || inputChar == '.') && string.IsNullOrEmpty(textBox.Text))
+                return false;
+
+            // Punkt und Komma als Dezimaltrennzeichen erlauben
+            return inputChar == ',' || inputChar == '.';
         }
+
 
         /// <summary>
         /// Validiert Eingaben für Int-Spalten: Nur Zahlen.
