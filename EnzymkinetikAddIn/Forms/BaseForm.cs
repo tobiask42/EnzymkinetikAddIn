@@ -21,7 +21,7 @@ namespace EnzymkinetikAddIn.Forms
     /// </summary>
     public partial class BaseForm : Form
     {
-        private string CurrentTimeUnit = "h"; // Standard: Stunden
+        private string currentTimeUnit = "h"; // Standard: Stunden
         private EnzymRibbon _ribbon;
 
         private ComboBoxManager _comboBoxManager;
@@ -70,9 +70,16 @@ namespace EnzymkinetikAddIn.Forms
             };
 
             UpdateComboBoxVisibility();
-            comboBoxTimeUnit.SelectedIndex = 0; // Setzt Standardwert auf "h"
-
-
+            // Setze die Auswahl explizit auf die aktuelle Zeiteinheit
+            if (!string.IsNullOrEmpty(currentTimeUnit) && comboBoxTimeUnit.Items.Contains(currentTimeUnit))
+            {
+                comboBoxTimeUnit.SelectedItem = currentTimeUnit;
+            }
+            else
+            {
+                comboBoxTimeUnit.SelectedIndex = 0; // Fallback auf Standardwert "h"
+                currentTimeUnit = comboBoxTimeUnit.SelectedItem.ToString(); // Synchronisieren
+            }
             ColumnSetup();
 
             SetMaximumSize();
@@ -93,13 +100,13 @@ namespace EnzymkinetikAddIn.Forms
                 {
                     if (double.TryParse(cell.Value.ToString(), out double timeValue))
                     {
-                        cell.Value = TimeConverter.ConvertTime(timeValue, CurrentTimeUnit, newUnit);
+                        cell.Value = TimeConverter.ConvertTime(timeValue, currentTimeUnit, newUnit);
                     }
                 }
             }
 
             // Aktualisiere die aktuelle Einheit
-            CurrentTimeUnit = newUnit;
+            currentTimeUnit = newUnit;
 
             // Aktualisiere den Spaltenkopf
             if (dataGridViewInputData.Columns["time"] is DataGridViewColumn timeColumn)
@@ -263,5 +270,16 @@ namespace EnzymkinetikAddIn.Forms
                 e.Handled = true;  // Zeichen blockieren
             }
         }
+
+        public void SetCurrentTimeUnit(string timeUnit)
+        {
+            currentTimeUnit = timeUnit;
+
+            if (comboBoxTimeUnit != null && comboBoxTimeUnit.Items.Contains(timeUnit))
+            {
+                comboBoxTimeUnit.SelectedItem = timeUnit;
+            }
+        }
+
     }
 }
