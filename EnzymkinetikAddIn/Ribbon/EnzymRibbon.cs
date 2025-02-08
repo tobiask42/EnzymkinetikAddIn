@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using EnzymkinetikAddIn.Constants;
 using EnzymkinetikAddIn.Data;
 using EnzymkinetikAddIn.Factories;
-using EnzymkinetikAddIn.Forms;
-using EnzymkinetikAddIn.Interfaces;
-using Microsoft.Office.Tools;
 using Microsoft.Office.Tools.Ribbon;
 
 namespace EnzymkinetikAddIn.Ribbon
@@ -21,7 +16,8 @@ namespace EnzymkinetikAddIn.Ribbon
         {
             _formFactory = new FormFactory();
             createRibbonDropDown();
-            
+            bool debug = true;
+            DatabaseHelper.InitializeDatabaseConnection(debug);
             LoadDataEntries();
             
         }
