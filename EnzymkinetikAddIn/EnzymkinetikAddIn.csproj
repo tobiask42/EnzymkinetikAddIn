@@ -238,7 +238,7 @@
     <Compile Include="Forms\BaseForm.Designer.cs">
       <DependentUpon>BaseForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Generators\DataSetGenerator.cs" />
+    <Compile Include="Generators\InputFormGenerator.cs" />
     <Compile Include="Generators\EditFormGenerator.cs" />
     <Compile Include="Interfaces\IExperimentData.cs" />
     <Compile Include="Interfaces\IFormGenerator.cs" />
