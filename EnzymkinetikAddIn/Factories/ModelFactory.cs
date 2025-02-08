@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EnzymkinetikAddIn.Constants;
 using EnzymkinetikAddIn.Interfaces;
 using EnzymkinetikAddIn.Models;
 
@@ -10,20 +11,25 @@ namespace EnzymkinetikAddIn.Factories
 {
     internal class ModelFactory
     {
+        private readonly Dictionary<string, Func<IModelLogic>> _modelRegistry;
+
+        public ModelFactory()
+        {
+            _modelRegistry = new Dictionary<string, Func<IModelLogic>>
+            {
+                { ModelConstants.Models[0], () => new RawData() },
+                { ModelConstants.Models[1], () => new MichaelisMenten() },
+                { ModelConstants.Models[2], () => new LineweaverBurk() }
+            };
+        }
 
         public IModelLogic GenerateModel(string modelName)
         {
-            switch (modelName)
+            if (_modelRegistry.TryGetValue(modelName, out Func<IModelLogic> modelCreator))
             {
-                case "Rohdaten":
-                    return new RawData();
-                case "Michaelis-Menten":
-                    return new MichaelisMenten();
-                case "Lineweaver-Burk":
-                    return new LineweaverBurk();
-                default:
-                    throw new ArgumentException($"Unbekanntes Modell: {modelName}");
+                return modelCreator();
             }
+            throw new ArgumentException($"Unbekanntes Modell: {modelName}");
         }
     }
 }
