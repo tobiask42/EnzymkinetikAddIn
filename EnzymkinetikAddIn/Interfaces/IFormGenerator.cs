@@ -9,6 +9,6 @@ namespace EnzymkinetikAddIn.Interfaces
 {
     internal interface IFormGenerator
     {
-        BaseForm GenerateForm(string concentration, string unit);
+        BaseForm GenerateForm(string values, string unit);
     }
 }
