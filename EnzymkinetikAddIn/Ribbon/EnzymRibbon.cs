@@ -17,7 +17,8 @@ namespace EnzymkinetikAddIn.Ribbon
             _formFactory = new FormFactory();
             createRibbonDropDown();
             bool debug = true;
-            DatabaseHelper.InitializeDatabaseConnection(debug);
+            string databaseName = "enzymkinetik.db";
+            DatabaseHelper.InitializeDatabaseConnection(debug, databaseName);
             LoadDataEntries();
             
         }

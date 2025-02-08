@@ -17,11 +17,11 @@ namespace EnzymkinetikAddIn.Data
 
 
         // Datenbankverbindungs-String initialisieren
-        public static void InitializeDatabaseConnection(bool isDebugMode)
+        public static void InitializeDatabaseConnection(bool isDebugMode, string databaseName)
         {
             string dbPath = isDebugMode
-                ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "enzymkinetik.db")
-                : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "enzymkinetik.db");
+                ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, databaseName)
+                : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), databaseName);
 
             _connectionString = $"Data Source={dbPath};Version=3;";
 
