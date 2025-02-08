@@ -63,8 +63,24 @@ namespace EnzymkinetikAddIn.Utilities
                 {
                     string oldColumn = mapping.Key;
                     string newColumn = mapping.Value;
+                    object oldValue = oldTableData.Rows[i][oldColumn];
 
-                    newRow[newColumn] = oldTableData.Rows[i][oldColumn]; // Werte direkt übertragen
+                    // NULL-Check für verschiedene Datentypen
+                    if (oldValue == DBNull.Value)
+                    {
+                        if (newTableData.Columns[newColumn].DataType == typeof(double))
+                        {
+                            newRow[newColumn] = double.NaN;  // Leere Werte als NaN für Double
+                        }
+                        else
+                        {
+                            newRow[newColumn] = ""; // Leere Strings für Textspalten
+                        }
+                    }
+                    else
+                    {
+                        newRow[newColumn] = oldValue;
+                    }
                 }
 
                 newTableData.Rows.Add(newRow);
