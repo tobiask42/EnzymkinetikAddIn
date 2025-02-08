@@ -11,7 +11,6 @@ namespace EnzymkinetikAddIn.Utilities
     internal class ColumnManager
     {
         private readonly DataGridView _grid;
-        private string _unit = "h";
 
         public ColumnManager(DataGridView grid)
         {
@@ -20,12 +19,12 @@ namespace EnzymkinetikAddIn.Utilities
         }
 
 
-        public ColumnManager InitializeTimeColumn()
+        public ColumnManager InitializeTimeColumn(string unit)
         {
             DataGridViewTextBoxColumn timeColumn = new DataGridViewTextBoxColumn
             {
                 Name = "time",
-                HeaderText = "Zeit (" + _unit + ")",
+                HeaderText = "Zeit (" + unit + ")",
                 ValueType = typeof(double),
             };
             _grid.Columns.Add(timeColumn);
@@ -174,11 +173,6 @@ namespace EnzymkinetikAddIn.Utilities
                     e.Handled = !ValidationHelper.IsValidDoubleInput(textBox, e.KeyChar);
                 }
             }
-        }
-
-        public void SetTimeUnit(string _unit)
-        {
-            this._unit = _unit;
         }
     }
 }

@@ -39,7 +39,7 @@ namespace EnzymkinetikAddIn.Generators
             {
             }
             var columnManager = new ColumnManager(dataGridView);
-            columnManager.InitializeTimeColumn();
+            columnManager.InitializeTimeColumn("h");
             for (int i = 1; i <= num_concentrations; i++)
             {
                 columnManager.InitializeIntCol("dilution_" + i, "c_" + i + "\nVerdünnung");

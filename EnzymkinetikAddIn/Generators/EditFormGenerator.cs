@@ -45,8 +45,7 @@ namespace EnzymkinetikAddIn.Generators
                         timeunit = "min";
                     }
                     currentTimeUnit = timeunit;
-                    columnManager.SetTimeUnit(timeunit);
-                    columnManager.InitializeTimeColumn();
+                    columnManager.InitializeTimeColumn(timeunit);
                     WriteToGrid(column, tableData, dataGridView, "time");
                 }
                 else if (columnLabel.Contains("Verdünnung"))
