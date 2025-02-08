@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.Windows.Forms;
 using System.Data;
@@ -13,137 +11,142 @@ namespace EnzymkinetikAddIn.Data
 {
     internal class DatabaseHelper
     {
-        // Speichern in AppData
-        //private static readonly string DbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"enzymkinetik.db");
-        
-        // Speichern im Projektverzeichnis
-        private static readonly string DbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "enzymkinetik.db");
+        private static string _connectionString = string.Empty;
 
-        private static readonly string ConnectionString = $"Data Source={DbPath};Version=3;";
+        public static string StorageName { get; private set; }
 
-        public static string StorageName;
 
-        static DatabaseHelper()
+        // Datenbankverbindungs-String initialisieren
+        public static void InitializeDatabaseConnection(bool isDebugMode)
         {
-            if (!File.Exists(DbPath))
+            string dbPath = isDebugMode
+                ? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "enzymkinetik.db")
+                : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "enzymkinetik.db");
+
+            _connectionString = $"Data Source={dbPath};Version=3;";
+
+            if (!File.Exists(dbPath))
             {
-                CreateDatabase();
+                CreateDatabase(dbPath);
             }
         }
 
-        public static SQLiteConnection GetConnection()
-        {
-            return new SQLiteConnection(ConnectionString);
-        }
+        // SQLite-Verbindung zurückgeben
+        private static SQLiteConnection GetConnection() => new SQLiteConnection(_connectionString);
 
-        private static void CreateDatabase()
-        {
-            SQLiteConnection.CreateFile(DbPath);
-        }
+        // Neue Datenbank erstellen
+        private static void CreateDatabase(string dbPath) => SQLiteConnection.CreateFile(dbPath);
 
-        public static bool SaveDataGridViewToDatabase(DataGridView dgv, string baseTableName, bool editmode = false)
+
+        public static bool SaveDataGridViewToDatabase(DataGridView dgv, string baseTableName, bool editMode = false)
         {
             if (dgv == null || dgv.Rows.Count == 0)
                 return false;
 
             List<string> tableNames = GetTableNames();
+
             using (var conn = GetConnection())
             {
                 string tableName = baseTableName;
                 conn.Open();
-                if (editmode == false && tableNames.Any(entry => entry.Contains(tableName)))
+
+                if (!editMode && tableNames.Contains(tableName))
                 {
                     tableName = GetUniqueTableName(conn, baseTableName);
                 }
-                
+
                 StorageName = tableName;
 
                 using (var transaction = conn.BeginTransaction())
                 {
                     try
                     {
-                        // **Nutze HeaderText für die Spaltennamen**
-                        var columnDefinitions = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>()
-                            .Select(c => $"[{SanitizeColumnName(c.HeaderText)}] {GetSqlType(c.ValueType)}"));
-
-                        string createTableQuery = $"CREATE TABLE {tableName} (ID INTEGER PRIMARY KEY AUTOINCREMENT, {columnDefinitions})";
-                        using (var cmd = new SQLiteCommand(createTableQuery, conn))
-                        {
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        // **HeaderText auch für Insert-Statements verwenden**
-                        foreach (DataGridViewRow row in dgv.Rows)
-                        {
-                            if (row.IsNewRow) continue;
-
-                            var columnNames = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>()
-                                .Select(c => $"[{SanitizeColumnName(c.HeaderText)}]"));
-                            var values = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>().Select(_ => "?"));
-
-                            string insertQuery = $"INSERT INTO {tableName} ({columnNames}) VALUES ({values})";
-
-                            using (var cmd = new SQLiteCommand(insertQuery, conn))
-                            {
-                                foreach (DataGridViewColumn col in dgv.Columns)
-                                {
-                                    object value = row.Cells[col.Index].Value ?? DBNull.Value;
-                                    cmd.Parameters.AddWithValue($"@{SanitizeColumnName(col.HeaderText)}", ConvertToSqlValue(value));
-                                }
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
+                        CreateTable(conn, dgv, tableName);
+                        InsertRows(conn, dgv, tableName);
 
                         transaction.Commit();
-                        return true; // Erfolgreich gespeichert
+                        return true;
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         transaction.Rollback();
-                        throw;
+                        MessageBox.Show($"Fehler: {ex.Message}", "Datenbankfehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
                     }
                 }
             }
         }
 
+        // Tabelle mit den Spalten aus DataGridView erstellen
+        private static void CreateTable(SQLiteConnection conn, DataGridView dgv, string tableName)
+        {
+            var columnDefinitions = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>()
+                .Select(c => $"[{SanitizeColumnName(c.HeaderText)}] {GetSqlType(c.ValueType)}"));
+
+            string createTableQuery = $"CREATE TABLE {tableName} (ID INTEGER PRIMARY KEY AUTOINCREMENT, {columnDefinitions})";
+            using (var cmd = new SQLiteCommand(createTableQuery, conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        // Zeilen in die Tabelle einfügen
+        private static void InsertRows(SQLiteConnection conn, DataGridView dgv, string tableName)
+        {
+            foreach (DataGridViewRow row in dgv.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                var columnNames = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>()
+                    .Select(c => $"[{SanitizeColumnName(c.HeaderText)}]"));
+                var values = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>().Select(_ => "?"));
+
+                string insertQuery = $"INSERT INTO {tableName} ({columnNames}) VALUES ({values})";
+
+                using (var cmd = new SQLiteCommand(insertQuery, conn))
+                {
+                    foreach (DataGridViewColumn col in dgv.Columns)
+                    {
+                        object value = row.Cells[col.Index].Value ?? DBNull.Value;
+                        cmd.Parameters.AddWithValue($"@{SanitizeColumnName(col.HeaderText)}", ConvertToSqlValue(value));
+                    }
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+        // Spaltennamen für SQLite validieren
         private static string SanitizeColumnName(string columnName)
         {
-            if (string.IsNullOrWhiteSpace(columnName))
-                return "Column";
+            if (string.IsNullOrWhiteSpace(columnName)) return "Column";
 
-            // Ersetze Leerzeichen durch Unterstriche und entferne Sonderzeichen
             string sanitized = Regex.Replace(columnName, @"[^\w]", "_");
 
-            // Verhindere, dass der Name mit einer Zahl beginnt (SQLite mag das nicht)
-            if (char.IsDigit(sanitized[0]))
-                sanitized = "_" + sanitized;
+            if (char.IsDigit(sanitized[0])) sanitized = "_" + sanitized;
 
             return sanitized;
         }
 
-
-
-
-
-        public static string GetUniqueTableName(SQLiteConnection conn, string baseName)
+        // SQL-Datentyp aus C#-Typen ableiten
+        private static string GetSqlType(Type type)
         {
-            int counter = 1;
-            string tableName = baseName;
-
-            using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name = @name", conn))
-            {
-                cmd.Parameters.AddWithValue("@name", tableName);
-
-                while (cmd.ExecuteScalar() != null) // Prüft, ob die Tabelle existiert
-                {
-                    tableName = $"{baseName}_{counter}";
-                    cmd.Parameters["@name"].Value = tableName;
-                    counter++;
-                }
-            }
-
-            return tableName;
+            if (type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(byte)) return "INTEGER";
+            if (type == typeof(float) || type == typeof(double) || type == typeof(decimal)) return "REAL";
+            if (type == typeof(bool)) return "BOOLEAN";
+            if (type == typeof(DateTime)) return "TEXT";
+            return "TEXT";
         }
+
+        // Umwandlung eines C#-Werts in SQL-kompatiblen Wert
+        private static object ConvertToSqlValue(object value)
+        {
+            if (value is bool boolVal) return boolVal ? 1 : 0;
+            if (value is DateTime dateVal) return dateVal.ToString("yyyy-MM-dd HH:mm:ss");
+            return value;
+        }
+
+        // Alle Tabellennamen abfragen
         public static List<string> GetTableNames()
         {
             List<string> tableNames = new List<string>();
@@ -158,7 +161,7 @@ namespace EnzymkinetikAddIn.Data
                 {
                     while (reader.Read())
                     {
-                        tableNames.Add(reader.GetString(0)); // Spaltenindex 0 enthält den Tabellennamen
+                        tableNames.Add(reader.GetString(0));
                     }
                 }
             }
@@ -166,51 +169,36 @@ namespace EnzymkinetikAddIn.Data
             return tableNames;
         }
 
-        private static string GetSqlType(Type type)
+        // Tabelle mit einzigartigem Namen finden
+        private static string GetUniqueTableName(SQLiteConnection conn, string baseName)
         {
-            if (type == typeof(int) || type == typeof(long) || type == typeof(short) || type == typeof(byte))
-                return "INTEGER";
-            if (type == typeof(float) || type == typeof(double) || type == typeof(decimal))
-                return "REAL";
-            if (type == typeof(bool))
-                return "BOOLEAN";
-            if (type == typeof(DateTime))
-                return "TEXT"; // SQLite speichert Datumswerte als TEXT im ISO 8601-Format
-            return "TEXT"; // Standardmäßig als TEXT speichern
-        }
+            int counter = 1;
+            string tableName = baseName;
 
-        private static object ConvertToSqlValue(object value)
-        {
-            if (value is bool boolVal)
-                return boolVal ? 1 : 0; // SQLite speichert BOOLEAN als INTEGER (0/1)
-            if (value is DateTime dateVal)
-                return dateVal.ToString("yyyy-MM-dd HH:mm:ss"); // Einheitliches ISO 8601-Format für Datumswerte
-            return value; // Alle anderen Werte unverändert lassen
-        }
-        public static void LoadTableToDataGridView(DataGridView dgv, string tableName)
-        {
-            using (var conn = GetConnection())
+            using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name = @name", conn))
             {
-                conn.Open();
-                string query = $"SELECT * FROM [{tableName}]";
+                cmd.Parameters.AddWithValue("@name", tableName);
 
-                using (var cmd = new SQLiteCommand(query, conn))
-                using (var adapter = new SQLiteDataAdapter(cmd))
+                while (cmd.ExecuteScalar() != null)
                 {
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-                    dgv.DataSource = dt;
+                    tableName = $"{baseName}_{counter}";
+                    cmd.Parameters["@name"].Value = tableName;
+                    counter++;
                 }
             }
+
+            return tableName;
         }
 
+
+        // Tabelle laden und zurückgeben
         public static DataTable LoadTable(string tableName)
         {
             using (var conn = GetConnection())
             {
                 conn.Open();
                 tableName = tableName.Replace(" ", "_");
-                // Hole alle Spaltennamen der Tabelle
+
                 var columnNames = new List<string>();
                 using (var cmd = new SQLiteCommand($"PRAGMA table_info({tableName});", conn))
                 using (var reader = cmd.ExecuteReader())
@@ -218,26 +206,33 @@ namespace EnzymkinetikAddIn.Data
                     while (reader.Read())
                     {
                         string columnName = reader["name"].ToString();
-
-                        // Füge die Spalte nur hinzu, wenn sie nicht 'ID' ist
-                        if (columnName != "ID")
-                        {
-                            columnNames.Add(columnName);
-                        }
+                        if (columnName != "ID") columnNames.Add(columnName);
                     }
                 }
 
-                // Erstelle das SELECT-Statement mit den verbleibenden Spalten
                 string selectQuery = $"SELECT {string.Join(", ", columnNames)} FROM [{tableName}]";
 
-                // Abruf der Daten in einen DataTable
                 using (var cmd = new SQLiteCommand(selectQuery, conn))
                 using (var adapter = new SQLiteDataAdapter(cmd))
                 {
                     DataTable dt = new DataTable();
                     adapter.Fill(dt);
-                    return dt; // Gibt den DataTable zurück
+                    return dt;
                 }
+            }
+        }
+
+        // Tabelle umbenennen
+        public static void RenameTable(string oldName, string newName)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+                newName = GetUniqueTableName(connection, newName);
+
+                string query = $"ALTER TABLE {oldName} RENAME TO {newName};";
+                var command = new SQLiteCommand(query, connection);
+                command.ExecuteNonQuery();
             }
         }
 
@@ -262,61 +257,18 @@ namespace EnzymkinetikAddIn.Data
             }
         }
 
-        public static void RenameTable(string oldName, string newName)
-        {
-            
-
-            using (var connection = GetConnection())
-            {
-                connection.Open();
-                newName = GetUniqueTableName(connection, newName);
-                string query = $"ALTER TABLE {oldName} RENAME TO {newName};";
-                var command = new SQLiteCommand(query, connection);
-                command.ExecuteNonQuery();
-            }
-        }
-
-
-        public static void SaveTable(DataTable dt, string tableName)
-        {
-            using (var conn = GetConnection())
-            {
-                conn.Open();
-
-                using (var transaction = conn.BeginTransaction())
-                {
-                    using (var adapter = new SQLiteDataAdapter($"SELECT * FROM [{tableName}]", conn))
-                    {
-                        var commandBuilder = new SQLiteCommandBuilder(adapter);
-                        adapter.UpdateCommand = commandBuilder.GetUpdateCommand();
-                        adapter.InsertCommand = commandBuilder.GetInsertCommand();
-                        adapter.DeleteCommand = commandBuilder.GetDeleteCommand();
-
-                        adapter.Update(dt);
-                    }
-
-                    transaction.Commit();
-                }
-            }
-        }
-
+        // Tabelle löschen
         public static void DeleteTable(string tableName)
         {
             using (var connection = GetConnection())
             {
-                connection.Open();  // Verbindung öffnen!
-                string query = $"DROP TABLE IF EXISTS [{tableName}];";  // Tabellenname in eckige Klammern setzen
+                connection.Open();
+                string query = $"DROP TABLE IF EXISTS [{tableName}];";
                 using (var command = new SQLiteCommand(query, connection))
                 {
                     command.ExecuteNonQuery();
                 }
             }
         }
-
-
-
-
     }
-
-
 }
