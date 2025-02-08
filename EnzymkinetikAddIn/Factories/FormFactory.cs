@@ -15,23 +15,17 @@ namespace EnzymkinetikAddIn.Factories
 {
     public class FormFactory
     {
-        //private readonly DataSetGenerator _dataSetGenerator;
-
-        public FormFactory()
-        {
-            //_dataSetGenerator = new DataSetGenerator();
-        }
 
         public BaseForm CreateForm(string concentration, string unit)
         {
-            DataSetGenerator _dataSetGenerator = new DataSetGenerator();
+            InputFormGenerator _dataSetGenerator = new InputFormGenerator();
             return _dataSetGenerator.GenerateForm(concentration, unit);
         }
 
         public BaseForm CreateEditForm(string tableName)
         {
             EditFormGenerator _editFormGenerator = new EditFormGenerator();
-            return _editFormGenerator.GenerateForm(tableName);
+            return _editFormGenerator.GenerateForm("", tableName);
         }
     }
 }
