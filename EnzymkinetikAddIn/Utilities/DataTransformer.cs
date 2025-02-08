@@ -22,8 +22,12 @@ namespace EnzymkinetikAddIn.Utilities
             foreach (DataColumn column in oldTableData.Columns)
             {
                 string columnName = column.ColumnName;
-
-                if (columnName.Contains("Zeit"))
+                if (columnName.Contains("Probe"))
+                {
+                    columnMappings[columnName] = columnName;
+                    newTableData.Columns.Add(columnName, typeof(int));
+                }
+                else if (columnName.Contains("Zeit"))
                 {
                     timeUnit = Char.ToString(columnName.ElementAt(6)) == "m" ? "min" : "s";
                     string newColumnName = "Zeit (" + timeUnit + ")";
@@ -46,13 +50,10 @@ namespace EnzymkinetikAddIn.Utilities
                     newTableData.Columns.Add(newColumnName, typeof(double));
                     columnMappings[columnName] = newColumnName;
                 }
-                else
-                {
-                    string newColumnName = "Kommentar";
-                    newTableData.Columns.Add(newColumnName, typeof(string));
-                    columnMappings[columnName] = newColumnName;
-                }
             }
+            columnMappings["Kommentar"] = "Kommentar";
+            newTableData.Columns.Add("Kommentar", typeof(string));
+
             // Daten spaltenweise übertragen
             int rowCount = oldTableData.Rows.Count;
             for (int i = 0; i < rowCount; i++)
