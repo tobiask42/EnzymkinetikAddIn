@@ -26,7 +26,7 @@ namespace EnzymkinetikAddIn.Forms
         private string selectedTableName = "";
         bool editMode = false;
 
-        private ComboBoxManager _comboBoxManager;
+        private readonly ComboBoxManager _comboBoxManager;
         public BaseForm()
         {
             InitializeComponent();
@@ -169,38 +169,6 @@ namespace EnzymkinetikAddIn.Forms
         private void ValidateTimeInput(object sender, KeyPressEventArgs e)
         {
             
-        }
-
-        /// <summary>
-        /// Formatiert die Werte in der "time"-Spalte.
-        /// </summary>
-        private void FormatTimeCell(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            if (e.ColumnIndex == dataGridViewInputData.Columns["time"].Index && e.Value is double)
-            {
-                e.Value = ((double)e.Value).ToString("N", CultureInfo.CurrentCulture);
-                e.FormattingApplied = true;
-            }
-        }
-
-        /// <summary>
-        /// Parst Eingaben in der "time"-Spalte.
-        /// </summary>
-        private void ParseTimeCell(object sender, DataGridViewCellParsingEventArgs e)
-        {
-            if (e.ColumnIndex == dataGridViewInputData.Columns["time"].Index && e.Value is string)
-            {
-                string input = e.Value.ToString().Replace(".", ","); // Punkt zu Komma
-                if (double.TryParse(input, NumberStyles.Any, CultureInfo.CurrentCulture, out double parsedValue))
-                {
-                    e.Value = parsedValue;
-                    e.ParsingApplied = true;
-                }
-                else
-                {
-                    e.ParsingApplied = false;
-                }
-            }
         }
 
         private void dataGridViewInputData_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
