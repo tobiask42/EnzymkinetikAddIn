@@ -20,7 +20,9 @@ namespace EnzymkinetikAddIn.Generators
 
             // Erstelle das Formular
             BaseForm form = new BaseForm();
-
+            string selectedTableName = tableName.Replace(" ", "_");
+            form.setSelectedTableName(selectedTableName);
+            form.setEditMode(true);
             // Zugriff auf das DataGridView des Formulars
             var dataGridView = form.GetDataGridView();
 
@@ -78,7 +80,7 @@ namespace EnzymkinetikAddIn.Generators
             }
             form.SetCurrentTimeUnit(currentTimeUnit);
             form.SetNameText(tableName);
-            form.setSelectedTableName(tableName);
+            
             return form;
         }
 

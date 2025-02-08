@@ -24,6 +24,7 @@ namespace EnzymkinetikAddIn.Forms
         private string currentTimeUnit = "h"; // Standard: Stunden
         private EnzymRibbon _ribbon;
         private string selectedTableName = "";
+        bool editMode = false;
 
         private ComboBoxManager _comboBoxManager;
         public BaseForm()
@@ -219,6 +220,13 @@ namespace EnzymkinetikAddIn.Forms
 
         private void saveButton_Click(object sender, EventArgs e)
         {
+            if (editMode)
+            {
+                EditTable();
+                _ribbon.LoadDataEntries();
+                this.Close();
+                return;
+            }
             if (string.IsNullOrWhiteSpace(nameTextBox.Text))
             {
                 MessageBox.Show("Bitte Namen für die Tabelle eingeben.", "Fehlender Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -237,7 +245,7 @@ namespace EnzymkinetikAddIn.Forms
                 if (success)
                 {
                     MessageBox.Show("Daten wurden erfolgreich unter " + tablename + " gespeichert.", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    _ribbon?.LoadDataEntries();
+                    _ribbon.LoadDataEntries();
                     this.Close();
                 }
             }
@@ -247,6 +255,10 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
+        private void EditTable()
+        {
+            DatabaseHelper.UpdateTableFromDataGridView(dataGridViewInputData,selectedTableName,nameTextBox.Text);
+        }
 
         public void SetRibbonReference(EnzymRibbon ribbon)
         {
@@ -289,7 +301,10 @@ namespace EnzymkinetikAddIn.Forms
 
         private void deleteButton_Click(object sender, EventArgs e)
         {
-            // Löschen der Tabelle implementieren
+            MessageBox.Show(selectedTableName);
+            DatabaseHelper.DeleteTable(selectedTableName);
+            _ribbon.LoadDataEntries();
+            this.Close();
         }
 
         public void showDeleteButton(bool showDelete)
@@ -300,6 +315,16 @@ namespace EnzymkinetikAddIn.Forms
         public void setSelectedTableName(string tableName)
         {
             selectedTableName = tableName;
+        }
+
+        public string getSelectedTableName()
+        {
+            return selectedTableName;
+        }
+
+        public void setEditMode(bool editMode)
+        {
+            this.editMode = editMode;
         }
     }
 }

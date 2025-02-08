@@ -67,22 +67,32 @@ namespace EnzymkinetikAddIn.Ribbon
 
         public void LoadDataEntries()
         {
+            
             if (dropDownDataSet == null) return;
 
             List<string> tables = DatabaseHelper.GetTableNames();
             dropDownDataSet.Items.Clear(); // Vorherige Einträge löschen
 
-            foreach (string tableName in tables)
-            {
-                var item = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-                item.Label = tableName.Replace("_"," ");
-                dropDownDataSet.Items.Add(item);
-            }
 
-            // Ersten Eintrag als Standard setzen
-            if (dropDownDataSet.Items.Count > 0)
+            //buttonEditData.Enabled = true; //implement later
+            if (tables.Count() > 0)
             {
-                
+                foreach (string tableName in tables)
+                {
+                    var item = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
+                    item.Label = tableName.Replace("_", " ");
+                    dropDownDataSet.Items.Add(item);
+                }
+                if (tables.Count() == 1)
+                {
+                    dropDownDataSet.Enabled = false;
+                    buttonEditData.Enabled = true;
+                }
+                else
+                {
+                    dropDownDataSet.Enabled = true;
+                    buttonEditData.Enabled = true;
+                }
             }
             else
             {
@@ -90,6 +100,7 @@ namespace EnzymkinetikAddIn.Ribbon
                 item.Label = "Keine Datensätze";
                 dropDownDataSet.Items.Add(item);
                 dropDownDataSet.Enabled = false;
+                buttonEditData.Enabled = false;
             }
         }
 

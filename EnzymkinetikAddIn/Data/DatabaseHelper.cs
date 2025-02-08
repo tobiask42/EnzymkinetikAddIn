@@ -41,16 +41,21 @@ namespace EnzymkinetikAddIn.Data
             SQLiteConnection.CreateFile(DbPath);
         }
 
-        public static bool SaveDataGridViewToDatabase(DataGridView dgv, string baseTableName)
+        public static bool SaveDataGridViewToDatabase(DataGridView dgv, string baseTableName, bool editmode = false)
         {
             if (dgv == null || dgv.Rows.Count == 0)
                 return false;
 
+            List<string> tableNames = GetTableNames();
             using (var conn = GetConnection())
             {
+                string tableName = baseTableName;
                 conn.Open();
-                string tableName = GetUniqueTableName(conn, baseTableName);
-
+                if (editmode == false && tableNames.Any(entry => entry.Contains(tableName)))
+                {
+                    tableName = GetUniqueTableName(conn, baseTableName);
+                }
+                
                 StorageName = tableName;
 
                 using (var transaction = conn.BeginTransaction())
@@ -236,6 +241,40 @@ namespace EnzymkinetikAddIn.Data
             }
         }
 
+        public static bool UpdateTableFromDataGridView(DataGridView dataGridView, string oldName, string tableName)
+        {
+            tableName = tableName.Replace(" ", "_");
+            MessageBox.Show("old:" + oldName + "\nnew:" + tableName);
+            if (!oldName.Equals(tableName))
+            {
+                RenameTable(oldName, tableName);
+            }
+            try
+            {
+                DeleteTable(tableName);
+                SaveDataGridViewToDatabase(dataGridView, tableName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fehler beim Aktualisieren: {ex.Message}", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        public static void RenameTable(string oldName, string newName)
+        {
+            
+
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+                newName = GetUniqueTableName(connection, newName);
+                string query = $"ALTER TABLE {oldName} RENAME TO {newName};";
+                var command = new SQLiteCommand(query, connection);
+                command.ExecuteNonQuery();
+            }
+        }
 
 
         public static void SaveTable(DataTable dt, string tableName)
@@ -261,7 +300,23 @@ namespace EnzymkinetikAddIn.Data
             }
         }
 
+        public static void DeleteTable(string tableName)
+        {
+            using (var connection = GetConnection())
+            {
+                connection.Open();  // Verbindung öffnen!
+                string query = $"DROP TABLE IF EXISTS [{tableName}];";  // Tabellenname in eckige Klammern setzen
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+
+
     }
 
-    
+
 }
