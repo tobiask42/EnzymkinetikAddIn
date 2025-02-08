@@ -21,7 +21,7 @@ namespace EnzymkinetikAddIn.Forms
     /// </summary>
     public partial class BaseForm : Form
     {
-        private string currentTimeUnit = "h"; // Standard: Stunden
+        private string currentTimeUnit = ""; // Standard: Stunden
         private EnzymRibbon _ribbon;
         private string selectedTableName = "";
         bool editMode = false;
@@ -30,19 +30,24 @@ namespace EnzymkinetikAddIn.Forms
         public BaseForm()
         {
             InitializeComponent();
-            DataGridViewTextBoxColumn sampleColum = new DataGridViewTextBoxColumn
-            {
-                Name = "sample",
-                HeaderText = "Probe",
-                ValueType = typeof(int),
-                ReadOnly = true,
-            };
-            dataGridViewInputData.Columns.Add(sampleColum);
+            InitializeSampleColumn();
 
             // Initialisiere den ComboBoxManager
             _comboBoxManager = new ComboBoxManager(comboBoxTimeUnit, labelTimeUnit);
             UpdateComboBoxVisibility();
 
+        }
+
+        private void InitializeSampleColumn()
+        {
+            var sampleColumn = new DataGridViewTextBoxColumn
+            {
+                Name = "sample",
+                HeaderText = "Probe",
+                ValueType = typeof(int),
+                ReadOnly = true
+            };
+            dataGridViewInputData.Columns.Add(sampleColumn);
         }
 
         private void UpdateComboBoxVisibility()
@@ -82,6 +87,9 @@ namespace EnzymkinetikAddIn.Forms
                 comboBoxTimeUnit.SelectedIndex = 0; // Fallback auf Standardwert "h"
                 currentTimeUnit = comboBoxTimeUnit.SelectedItem.ToString(); // Synchronisieren
             }
+
+            UpdateTimeColumn();
+
             ColumnSetup();
 
             SetMaximumSize();
