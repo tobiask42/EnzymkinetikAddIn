@@ -17,6 +17,7 @@ namespace EnzymkinetikAddIn.Constants
             // Initialisierung der Liste der Modelle
             Models = new List<string>
             {
+                "Rohdaten",
                 "Michaelis-Menten",
                 "Lineweaver-Burk"
             };
