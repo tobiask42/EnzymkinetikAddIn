@@ -8,12 +8,13 @@ using EnzymkinetikAddIn.Data;
 using System.Windows.Forms;
 using EnzymkinetikAddIn.Forms;
 using EnzymkinetikAddIn.Utilities;
+using EnzymkinetikAddIn.Interfaces;
 
 namespace EnzymkinetikAddIn.Generators
 {
-    internal class EditFormGenerator
+    internal class EditFormGenerator : IFormGenerator
     {
-        public BaseForm GenerateForm(string tableName)
+        public BaseForm GenerateForm(string values, string tableName)
         {
             // Lade die Daten aus der Datenbank
             DataTable tableData = DatabaseHelper.LoadTable(tableName);
