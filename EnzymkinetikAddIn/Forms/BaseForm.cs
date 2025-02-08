@@ -23,6 +23,7 @@ namespace EnzymkinetikAddIn.Forms
     {
         private string currentTimeUnit = "h"; // Standard: Stunden
         private EnzymRibbon _ribbon;
+        private string selectedTableName = "";
 
         private ComboBoxManager _comboBoxManager;
         public BaseForm()
@@ -281,5 +282,24 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
+        public void SetNameText(string name)
+        {
+            nameTextBox.Text = name;
+        }
+
+        private void deleteButton_Click(object sender, EventArgs e)
+        {
+            // Löschen der Tabelle implementieren
+        }
+
+        public void showDeleteButton(bool showDelete)
+        {
+            deleteButton.Visible = showDelete;
+        }
+
+        public void setSelectedTableName(string tableName)
+        {
+            selectedTableName = tableName;
+        }
     }
 }

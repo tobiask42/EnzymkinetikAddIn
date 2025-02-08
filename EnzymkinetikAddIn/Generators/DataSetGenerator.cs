@@ -22,6 +22,8 @@ namespace EnzymkinetikAddIn.Generators
             var dataGridView = form.GetDataGridView();
 
             ConfigureColumns(dataGridView, concentration, unit);
+
+            form.showDeleteButton(false);
             // Gibt das konfigurierte Formular zurück
             return form;
         }

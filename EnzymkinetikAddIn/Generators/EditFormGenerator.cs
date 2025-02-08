@@ -77,6 +77,8 @@ namespace EnzymkinetikAddIn.Generators
                 WriteToGrid(column, tableData, dataGridView, "comment");
             }
             form.SetCurrentTimeUnit(currentTimeUnit);
+            form.SetNameText(tableName);
+            form.setSelectedTableName(tableName);
             return form;
         }
 
