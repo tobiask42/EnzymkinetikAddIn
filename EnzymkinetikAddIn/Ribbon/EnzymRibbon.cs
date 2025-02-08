@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using EnzymkinetikAddIn.Constants;
 using EnzymkinetikAddIn.Data;
+using EnzymkinetikAddIn.Exports;
 using EnzymkinetikAddIn.Factories;
+using EnzymkinetikAddIn.Interfaces;
+using EnzymkinetikAddIn.Utilities;
 using Microsoft.Office.Tools.Ribbon;
 
 namespace EnzymkinetikAddIn.Ribbon
@@ -11,6 +16,7 @@ namespace EnzymkinetikAddIn.Ribbon
     public partial class EnzymRibbon
     {
         private FormFactory _formFactory;
+        private ModelFactory _modelFactory;
 
         // Konstanten für wiederverwendbare Strings
         private const string NoDataSetsMessage = "Keine Datensätze";
@@ -22,6 +28,7 @@ namespace EnzymkinetikAddIn.Ribbon
         private void EnzymRibbon_Load(object sender, RibbonUIEventArgs e)
         {
             _formFactory = new FormFactory();
+            _modelFactory = new ModelFactory();
             createRibbonDropDown();
             bool debug = true;
             string databaseName = "enzymkinetik.db";
@@ -135,6 +142,24 @@ namespace EnzymkinetikAddIn.Ribbon
 
             form.SetRibbonReference(this);
             form.ShowDialog();
+        }
+
+        private void buttonGenerateResult_Click(object sender, RibbonControlEventArgs e)
+        {
+            string tableName = dropDownDataSet.SelectedItem.Label;
+            string modelName = dropDownModel.SelectedItem.Label;
+
+            try
+            {
+                var model = _modelFactory.GenerateModel(modelName);
+                List<List<DataTable>> result = model.CalculateResult(tableName);
+
+                ExcelExporter.ExportToExcel(result);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Fehler: " + ex.Message);
+            }
         }
     }
 }

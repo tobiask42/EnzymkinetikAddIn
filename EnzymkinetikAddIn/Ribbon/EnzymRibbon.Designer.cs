@@ -134,6 +134,7 @@ namespace EnzymkinetikAddIn.Ribbon
             // 
             this.buttonGenerateResult.Label = "Tabellen Generieren";
             this.buttonGenerateResult.Name = "buttonGenerateResult";
+            this.buttonGenerateResult.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonGenerateResult_Click);
             // 
             // EnzymRibbon
             // 

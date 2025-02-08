@@ -234,6 +234,7 @@
     <Compile Include="Exports\ExcelExporter.cs" />
     <Compile Include="Exports\ExcelHelper.cs" />
     <Compile Include="Factories\FormFactory.cs" />
+    <Compile Include="Factories\ModelFactory.cs" />
     <Compile Include="Forms\BaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -245,10 +246,14 @@
     <Compile Include="Interfaces\IExperimentData.cs" />
     <Compile Include="Interfaces\IFormGenerator.cs" />
     <Compile Include="Interfaces\IModelLogic.cs" />
+    <Compile Include="Models\LineweaverBurk.cs" />
+    <Compile Include="Models\MichaelisMenten.cs" />
+    <Compile Include="Models\RawData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utilities\ComboBoxManager.cs" />
+    <Compile Include="Utilities\DataTransformer.cs" />
     <Compile Include="Utilities\SampleHelper.cs" />
     <Compile Include="Utilities\DataGridViewTextBoxHandler.cs" />
     <Compile Include="Utilities\ColumnManager.cs" />
@@ -299,7 +304,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Logic\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
