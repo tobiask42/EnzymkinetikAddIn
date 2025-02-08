@@ -231,6 +231,8 @@
   <ItemGroup>
     <Compile Include="Constants\ModelConstants.cs" />
     <Compile Include="Data\DatabaseHelper.cs" />
+    <Compile Include="Exports\ExcelExporter.cs" />
+    <Compile Include="Exports\ExcelHelper.cs" />
     <Compile Include="Factories\FormFactory.cs" />
     <Compile Include="Forms\BaseForm.cs">
       <SubType>Form</SubType>
