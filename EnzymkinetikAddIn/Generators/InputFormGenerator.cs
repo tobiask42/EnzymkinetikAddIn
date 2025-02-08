@@ -11,7 +11,7 @@ using EnzymkinetikAddIn.Utilities;
 
 namespace EnzymkinetikAddIn.Generators
 {
-    internal class DataSetGenerator : IFormGenerator
+    internal class InputFormGenerator : IFormGenerator
     {
         public BaseForm GenerateForm(string concentration, string unit)
         {
