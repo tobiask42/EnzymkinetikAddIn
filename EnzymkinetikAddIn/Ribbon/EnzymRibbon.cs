@@ -12,6 +12,13 @@ namespace EnzymkinetikAddIn.Ribbon
     {
         private FormFactory _formFactory;
 
+        // Konstanten für wiederverwendbare Strings
+        private const string NoDataSetsMessage = "Keine Datensätze";
+        private const string PleaseSelectTableMessage = "Bitte eine Tabelle auswählen.";
+        private const string GramPerLiter = "g/L";
+        private const string MgPerDLiter = "mg/dL";
+
+
         private void EnzymRibbon_Load(object sender, RibbonUIEventArgs e)
         {
             _formFactory = new FormFactory();
@@ -30,16 +37,20 @@ namespace EnzymkinetikAddIn.Ribbon
             AddModelsToDropDown(dropDownModel);
         }
 
+        // Gemeinsame Methode zur Erstellung von Dropdown-Items
+        private void AddItemsToDropDown(RibbonDropDown dropDown, IEnumerable<string> items)
+        {
+            foreach (var item in items)
+            {
+                var ribbonItem = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
+                ribbonItem.Label = item;
+                dropDown.Items.Add(ribbonItem);
+            }
+        }
+
         private void AddModelsToDropDown(RibbonDropDown dropDown)
         {
-            var models = ModelConstants.Models;
-            // Für jedes Modell ein RibbonDropDownItem erstellen und hinzufügen
-            foreach (var model in models)
-            {
-                var item = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-                item.Label = model;  // Setze das Label auf den Modellnamen
-                dropDown.Items.Add(item);  // Füge das Item dem Dropdown hinzu
-            }
+            AddItemsToDropDown(dropDown, ModelConstants.Models);
         }
 
         private void AddNumbersToDropdown(RibbonDropDown dropDown, int start, int end)
@@ -55,10 +66,10 @@ namespace EnzymkinetikAddIn.Ribbon
         private void AddUnitsToDropDown(RibbonDropDown dropDown)
         {
             var item = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-            item.Label = "g/L";
+            item.Label = GramPerLiter;
             dropDown.Items.Add(item);
             var item2 = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-            item2.Label = "mg/dL";
+            item2.Label = MgPerDLiter;
             dropDown.Items.Add(item2);
         }
 
@@ -94,7 +105,7 @@ namespace EnzymkinetikAddIn.Ribbon
             else
             {
                 var item = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-                item.Label = "Keine Datensätze";
+                item.Label = NoDataSetsMessage;
                 dropDownDataSet.Items.Add(item);
                 dropDownDataSet.Enabled = false;
                 buttonEditData.Enabled = false;
@@ -115,7 +126,7 @@ namespace EnzymkinetikAddIn.Ribbon
         {
             if (dropDownDataSet.SelectedItem == null)
             {
-                MessageBox.Show("Bitte eine Tabelle auswählen.", "Hinweis", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(PleaseSelectTableMessage, "Hinweis", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
