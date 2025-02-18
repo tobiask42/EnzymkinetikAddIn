@@ -22,7 +22,7 @@ namespace EnzymkinetikAddIn.Generators
             var dataGridView = form.GetDataGridView();
 
             ConfigureColumns(dataGridView, concentration, unit);
-
+            form.ShowComboBoxEntryName(false);
             form.showDeleteButton(false);
             // Gibt das konfigurierte Formular zurück
             return form;
@@ -39,6 +39,7 @@ namespace EnzymkinetikAddIn.Generators
             {
             }
             var columnManager = new ColumnManager(dataGridView);
+            columnManager.InitializeSampleColumn();
             columnManager.InitializeTimeColumn("h");
             for (int i = 1; i <= num_concentrations; i++)
             {

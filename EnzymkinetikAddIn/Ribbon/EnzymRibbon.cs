@@ -7,6 +7,7 @@ using EnzymkinetikAddIn.Constants;
 using EnzymkinetikAddIn.Data;
 using EnzymkinetikAddIn.Exports;
 using EnzymkinetikAddIn.Factories;
+using EnzymkinetikAddIn.Forms;
 using EnzymkinetikAddIn.Interfaces;
 using EnzymkinetikAddIn.Utilities;
 using Microsoft.Office.Tools.Ribbon;
@@ -82,42 +83,32 @@ namespace EnzymkinetikAddIn.Ribbon
 
         public void LoadDataEntries()
         {
-            
             if (dropDownDataSet == null) return;
 
-            List<string> tables = DatabaseHelper.GetTableNames();
-            dropDownDataSet.Items.Clear(); // Vorherige Einträge löschen
+            List<string> entries = DatabaseHelper.GetEntryNames();
+            dropDownDataSet.Items.Clear();
 
-
-            //buttonEditData.Enabled = true; //implement later
-            if (tables.Count() > 0)
+            if (entries.Count > 0)
             {
-                foreach (string tableName in tables)
+                foreach (string entry in entries)
                 {
                     var item = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-                    item.Label = tableName.Replace("_", " ");
+                    item.Label = entry;
                     dropDownDataSet.Items.Add(item);
                 }
-                if (tables.Count() == 1)
-                {
-                    dropDownDataSet.Enabled = false;
-                    buttonEditData.Enabled = true;
-                }
-                else
-                {
-                    dropDownDataSet.Enabled = true;
-                    buttonEditData.Enabled = true;
-                }
+                dropDownDataSet.Enabled = true;
+                buttonEditData.Enabled = true;
             }
             else
             {
                 var item = Globals.Factory.GetRibbonFactory().CreateRibbonDropDownItem();
-                item.Label = NoDataSetsMessage;
+                item.Label = "Keine Einträge vorhanden";
                 dropDownDataSet.Items.Add(item);
                 dropDownDataSet.Enabled = false;
                 buttonEditData.Enabled = false;
             }
         }
+
 
         private void buttonOpenInputForm_Click(object sender, RibbonControlEventArgs e)
         {
@@ -131,18 +122,16 @@ namespace EnzymkinetikAddIn.Ribbon
 
         private void buttonEditData_Click(object sender, RibbonControlEventArgs e)
         {
-            if (dropDownDataSet.SelectedItem == null)
-            {
-                MessageBox.Show(PleaseSelectTableMessage, "Hinweis", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+            if (dropDownDataSet.SelectedItem == null) return;
 
-            string tableName = dropDownDataSet.SelectedItem.Label;
-            var form = _formFactory.CreateEditForm(tableName);
+            string selectedEntry = dropDownDataSet.SelectedItem.Label; // Hauptname holen
+            string selectedTable = ""; // Hier müsste die Logik rein, wie der Benutzer eine Tabelle auswählt
 
-            form.SetRibbonReference(this);
-            form.ShowDialog();
+            FormFactory factory = new FormFactory();
+            BaseForm editForm = factory.CreateEditForm(selectedEntry, selectedTable);
+            editForm.Show();
         }
+
 
         private void buttonGenerateResult_Click(object sender, RibbonControlEventArgs e)
         {
@@ -160,6 +149,11 @@ namespace EnzymkinetikAddIn.Ribbon
             {
                 System.Windows.Forms.MessageBox.Show("Fehler: " + ex.Message);
             }
+        }
+
+        private void buttonAddTable_Click(object sender, RibbonControlEventArgs e)
+        {
+
         }
     }
 }

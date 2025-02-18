@@ -49,6 +49,7 @@ namespace EnzymkinetikAddIn.Ribbon
             this.dropDownOrientation = this.Factory.CreateRibbonDropDown();
             this.checkBoxSeparate = this.Factory.CreateRibbonCheckBox();
             this.buttonGenerateResult = this.Factory.CreateRibbonButton();
+            this.buttonAddTable = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
@@ -117,6 +118,7 @@ namespace EnzymkinetikAddIn.Ribbon
             this.group3.Items.Add(this.dropDownOrientation);
             this.group3.Items.Add(this.checkBoxSeparate);
             this.group3.Items.Add(this.buttonGenerateResult);
+            this.group3.Items.Add(this.buttonAddTable);
             this.group3.Label = "group3";
             this.group3.Name = "group3";
             // 
@@ -135,6 +137,12 @@ namespace EnzymkinetikAddIn.Ribbon
             this.buttonGenerateResult.Label = "Tabellen Generieren";
             this.buttonGenerateResult.Name = "buttonGenerateResult";
             this.buttonGenerateResult.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonGenerateResult_Click);
+            // 
+            // buttonAddTable
+            // 
+            this.buttonAddTable.Label = "Tabelle hinzufügen";
+            this.buttonAddTable.Name = "buttonAddTable";
+            this.buttonAddTable.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonAddTable_Click);
             // 
             // EnzymRibbon
             // 
@@ -169,6 +177,7 @@ namespace EnzymkinetikAddIn.Ribbon
         internal Microsoft.Office.Tools.Ribbon.RibbonDropDown dropDownModel;
         internal Microsoft.Office.Tools.Ribbon.RibbonDropDown dropDownOrientation;
         internal Microsoft.Office.Tools.Ribbon.RibbonDropDown dropDownUnit;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonAddTable;
     }
 
     partial class ThisRibbonCollection

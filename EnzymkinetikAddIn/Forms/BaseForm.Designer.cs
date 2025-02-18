@@ -34,6 +34,7 @@
             this.nameTextBox = new System.Windows.Forms.TextBox();
             this.saveButton = new System.Windows.Forms.Button();
             this.deleteButton = new System.Windows.Forms.Button();
+            this.comboBoxEntryName = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewInputData)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,8 +48,6 @@
             this.dataGridViewInputData.Name = "dataGridViewInputData";
             this.dataGridViewInputData.Size = new System.Drawing.Size(686, 303);
             this.dataGridViewInputData.TabIndex = 0;
-            this.dataGridViewInputData.RowsAdded += new System.Windows.Forms.DataGridViewRowsAddedEventHandler(this.dataGridViewInputData_RowsAdded);
-            this.dataGridViewInputData.RowsRemoved += new System.Windows.Forms.DataGridViewRowsRemovedEventHandler(this.dataGridViewInputData_RowsRemoved);
             // 
             // labelTimeUnit
             // 
@@ -97,11 +96,21 @@
             this.deleteButton.UseVisualStyleBackColor = true;
             this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
             // 
+            // comboBoxEntryName
+            // 
+            this.comboBoxEntryName.FormattingEnabled = true;
+            this.comboBoxEntryName.Location = new System.Drawing.Point(547, 30);
+            this.comboBoxEntryName.Name = "comboBoxEntryName";
+            this.comboBoxEntryName.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxEntryName.TabIndex = 6;
+            this.comboBoxEntryName.SelectedIndexChanged += new System.EventHandler(this.comboBoxEntryName_SelectedIndexChanged);
+            // 
             // BaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.comboBoxEntryName);
             this.Controls.Add(this.deleteButton);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.nameTextBox);
@@ -125,5 +134,6 @@
         private System.Windows.Forms.TextBox nameTextBox;
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.Button deleteButton;
+        private System.Windows.Forms.ComboBox comboBoxEntryName;
     }
 }

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using EnzymkinetikAddIn.Data;
 using EnzymkinetikAddIn.Interfaces;
+using EnzymkinetikAddIn.Managers;
 using EnzymkinetikAddIn.Ribbon;
 using EnzymkinetikAddIn.Utilities;
 
@@ -21,6 +22,7 @@ namespace EnzymkinetikAddIn.Forms
     /// </summary>
     public partial class BaseForm : Form
     {
+        private DataGridManager _dataGridManager;
         private string currentTimeUnit = ""; // Standard: Stunden
         private EnzymRibbon _ribbon;
         private string selectedTableName = "";
@@ -30,25 +32,48 @@ namespace EnzymkinetikAddIn.Forms
         public BaseForm()
         {
             InitializeComponent();
-            InitializeSampleColumn();
-
-            // Initialisiere den ComboBoxManager
+            _dataGridManager = new DataGridManager(GetDataGridView());
             _comboBoxManager = new ComboBoxManager(comboBoxTimeUnit, labelTimeUnit);
             UpdateComboBoxVisibility();
 
         }
 
-        private void InitializeSampleColumn()
+        public void ShowComboBoxEntryName(bool visible, string entryName)
         {
-            var sampleColumn = new DataGridViewTextBoxColumn
+            if (visible)
             {
-                Name = "sample",
-                HeaderText = "Probe",
-                ValueType = typeof(int),
-                ReadOnly = true
-            };
-            dataGridViewInputData.Columns.Add(sampleColumn);
+                InitializeEntryNameComboBox(entryName);
+            }
+                if (Controls.ContainsKey("comboBoxEntryName"))
+            {
+                Controls["comboBoxEntryName"].Visible = visible;
+            }
         }
+
+        public void ShowComboBoxEntryName(bool visible)
+        {
+            if (Controls.ContainsKey("comboBoxEntryName"))
+            {
+                Controls["comboBoxEntryName"].Visible=visible;
+            }
+        }
+
+        private void InitializeEntryNameComboBox(string entryName)
+        {
+            comboBoxEntryName.Items.Clear();
+            List<string> tableNames = DatabaseHelper.GetTablesForEntry(entryName);
+
+            foreach (string table in tableNames)
+            {
+                comboBoxEntryName.Items.Add(table);
+            }
+
+            if (comboBoxEntryName.Items.Count > 0)
+            {
+                comboBoxEntryName.SelectedIndex = 0;
+            }
+        }
+
 
         private void UpdateComboBoxVisibility()
         {
@@ -179,16 +204,6 @@ namespace EnzymkinetikAddIn.Forms
             
         }
 
-        private void dataGridViewInputData_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
-        {
-            SampleHelper.UpdateRowNumbers(dataGridViewInputData, "sample");
-        }
-
-        private void dataGridViewInputData_RowsRemoved(object sender, DataGridViewRowsRemovedEventArgs e)
-        {
-            SampleHelper.UpdateRowNumbers(dataGridViewInputData, "sample");
-        }
-
         public DataGridView GetDataGridView()
         {
             return dataGridViewInputData;
@@ -212,11 +227,11 @@ namespace EnzymkinetikAddIn.Forms
 
             try
             {
-
+                string entryName = comboBoxEntryName.Text;
                 string tablename = nameTextBox.Text.Trim();
                 tablename = Regex.Replace(tablename, @"\s+", "_");
 
-                bool success = DatabaseHelper.SaveDataGridViewToDatabase(dataGridViewInputData, tablename);
+                bool success = DatabaseHelper.SaveDataGridViewToDatabase(dataGridViewInputData, tablename, entryName);
                 tablename = DatabaseHelper.StorageName.Replace("_"," ");
                 if (success)
                 {
@@ -301,6 +316,13 @@ namespace EnzymkinetikAddIn.Forms
         public void setEditMode(bool editMode)
         {
             this.editMode = editMode;
+        }
+
+        private void comboBoxEntryName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string selectedTable = comboBoxEntryName.SelectedItem.ToString();
+            _dataGridManager.LoadTable(selectedTable);
+
         }
     }
 }

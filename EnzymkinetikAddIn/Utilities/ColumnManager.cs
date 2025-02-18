@@ -18,6 +18,28 @@ namespace EnzymkinetikAddIn.Utilities
             _grid.EditingControlShowing += Grid_EditingControlShowing;
         }
 
+        public ColumnManager InitializeSampleColumn()
+        {
+            if (!_grid.Columns.Contains("sample"))
+            {
+                DataGridViewTextBoxColumn sampleColumn = new DataGridViewTextBoxColumn
+                {
+                    Name = "sample",
+                    HeaderText = "Probe",
+                    ValueType = typeof(int),
+                    ReadOnly = true
+                };
+                _grid.Columns.Insert(0, sampleColumn); // Füge die Spalte als erste Spalte hinzu
+            }
+
+            // Aktualisiere die Werte, wenn sich Zeilen ändern
+            _grid.RowsAdded += (s, e) => SampleHelper.UpdateRowNumbers(_grid, "sample");
+            _grid.RowsRemoved += (s, e) => SampleHelper.UpdateRowNumbers(_grid, "sample");
+
+            return this;
+        }
+
+
 
         public ColumnManager InitializeTimeColumn(string unit)
         {
