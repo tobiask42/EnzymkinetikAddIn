@@ -23,10 +23,10 @@ namespace EnzymkinetikAddIn.Generators
 
             var dataGridView = form.GetDataGridView();
             DataGridManager dataGridManager = new DataGridManager(dataGridView);
-            dataGridManager.LoadTable(tableName);
+            dataGridManager.LoadTable(entryName);
 
             // Hauptnamen an das BaseForm übergeben!
-            form.ShowComboBoxEntryName(true, entryName);
+            form.ShowcomboBoxTableName(true, tableName);
 
             form.SetNameText(tableName);
             return form;

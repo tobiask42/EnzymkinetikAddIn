@@ -34,7 +34,13 @@
             this.nameTextBox = new System.Windows.Forms.TextBox();
             this.saveButton = new System.Windows.Forms.Button();
             this.deleteButton = new System.Windows.Forms.Button();
-            this.comboBoxEntryName = new System.Windows.Forms.ComboBox();
+            this.comboBoxTableName = new System.Windows.Forms.ComboBox();
+            this.comboBoxConcentration = new System.Windows.Forms.ComboBox();
+            this.comboBoxUnit = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.labelConc = new System.Windows.Forms.Label();
+            this.labelUnit = new System.Windows.Forms.Label();
+            this.labelTables = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewInputData)).BeginInit();
             this.SuspendLayout();
             // 
@@ -96,21 +102,79 @@
             this.deleteButton.UseVisualStyleBackColor = true;
             this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
             // 
-            // comboBoxEntryName
+            // comboBoxTableName
             // 
-            this.comboBoxEntryName.FormattingEnabled = true;
-            this.comboBoxEntryName.Location = new System.Drawing.Point(547, 30);
-            this.comboBoxEntryName.Name = "comboBoxEntryName";
-            this.comboBoxEntryName.Size = new System.Drawing.Size(121, 21);
-            this.comboBoxEntryName.TabIndex = 6;
-            this.comboBoxEntryName.SelectedIndexChanged += new System.EventHandler(this.comboBoxEntryName_SelectedIndexChanged);
+            this.comboBoxTableName.FormattingEnabled = true;
+            this.comboBoxTableName.Location = new System.Drawing.Point(502, 30);
+            this.comboBoxTableName.Name = "comboBoxTableName";
+            this.comboBoxTableName.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxTableName.TabIndex = 6;
+            this.comboBoxTableName.SelectedIndexChanged += new System.EventHandler(this.comboBoxTableName_SelectedIndexChanged);
+            // 
+            // comboBoxConcentration
+            // 
+            this.comboBoxConcentration.FormattingEnabled = true;
+            this.comboBoxConcentration.Location = new System.Drawing.Point(248, 30);
+            this.comboBoxConcentration.Name = "comboBoxConcentration";
+            this.comboBoxConcentration.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxConcentration.TabIndex = 7;
+            // 
+            // comboBoxUnit
+            // 
+            this.comboBoxUnit.FormattingEnabled = true;
+            this.comboBoxUnit.Location = new System.Drawing.Point(375, 30);
+            this.comboBoxUnit.Name = "comboBoxUnit";
+            this.comboBoxUnit.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxUnit.TabIndex = 8;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(0, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(35, 13);
+            this.label1.TabIndex = 9;
+            this.label1.Text = "label1";
+            // 
+            // labelConc
+            // 
+            this.labelConc.AutoSize = true;
+            this.labelConc.Location = new System.Drawing.Point(248, 9);
+            this.labelConc.Name = "labelConc";
+            this.labelConc.Size = new System.Drawing.Size(84, 13);
+            this.labelConc.TabIndex = 10;
+            this.labelConc.Text = "Konzentrationen";
+            // 
+            // labelUnit
+            // 
+            this.labelUnit.AutoSize = true;
+            this.labelUnit.Location = new System.Drawing.Point(375, 11);
+            this.labelUnit.Name = "labelUnit";
+            this.labelUnit.Size = new System.Drawing.Size(39, 13);
+            this.labelUnit.TabIndex = 11;
+            this.labelUnit.Text = "Einheit";
+            // 
+            // labelTables
+            // 
+            this.labelTables.AutoSize = true;
+            this.labelTables.Location = new System.Drawing.Point(502, 9);
+            this.labelTables.Name = "labelTables";
+            this.labelTables.Size = new System.Drawing.Size(42, 13);
+            this.labelTables.TabIndex = 12;
+            this.labelTables.Text = "Tabelle";
             // 
             // BaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.comboBoxEntryName);
+            this.Controls.Add(this.labelTables);
+            this.Controls.Add(this.labelUnit);
+            this.Controls.Add(this.labelConc);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.comboBoxUnit);
+            this.Controls.Add(this.comboBoxConcentration);
+            this.Controls.Add(this.comboBoxTableName);
             this.Controls.Add(this.deleteButton);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.nameTextBox);
@@ -134,6 +198,12 @@
         private System.Windows.Forms.TextBox nameTextBox;
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.Button deleteButton;
-        private System.Windows.Forms.ComboBox comboBoxEntryName;
+        private System.Windows.Forms.ComboBox comboBoxTableName;
+        private System.Windows.Forms.ComboBox comboBoxConcentration;
+        private System.Windows.Forms.ComboBox comboBoxUnit;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelConc;
+        private System.Windows.Forms.Label labelUnit;
+        private System.Windows.Forms.Label labelTables;
     }
 }

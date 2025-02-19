@@ -23,11 +23,15 @@ namespace EnzymkinetikAddIn.Forms
     public partial class BaseForm : Form
     {
         private DataGridManager _dataGridManager;
-        private string currentTimeUnit = ""; // Standard: Stunden
+        private string currentTimeUnit = "";
         private EnzymRibbon _ribbon;
         private string selectedTableName = "";
-        bool editMode = false;
-
+        private bool editMode = false;
+        private string _entryName;
+        private List<DataGridView> _tableList = new List<DataGridView>();
+        private int _currentTableIndex = 0;
+        private string _selectedUnit;
+        private string _selectedConcentration;
         private readonly ComboBoxManager _comboBoxManager;
         public BaseForm()
         {
@@ -35,42 +39,62 @@ namespace EnzymkinetikAddIn.Forms
             _dataGridManager = new DataGridManager(GetDataGridView());
             _comboBoxManager = new ComboBoxManager(comboBoxTimeUnit, labelTimeUnit);
             UpdateComboBoxVisibility();
+            InitializeDropdowns();
 
         }
 
-        public void ShowComboBoxEntryName(bool visible, string entryName)
+        public void ShowcomboBoxTableName(bool visible, string entryName)
         {
             if (visible)
             {
                 InitializeEntryNameComboBox(entryName);
             }
-                if (Controls.ContainsKey("comboBoxEntryName"))
+                if (Controls.ContainsKey("comboBoxTableName"))
             {
-                Controls["comboBoxEntryName"].Visible = visible;
+                Controls["comboBoxTableName"].Visible = visible;
+            }
+            if (Controls.ContainsKey("labelTables"))
+            {
+                Controls["labelTables"].Visible = visible;
             }
         }
 
-        public void ShowComboBoxEntryName(bool visible)
+        public void ShowcomboBoxTableName(bool visible)
         {
-            if (Controls.ContainsKey("comboBoxEntryName"))
+            if (Controls.ContainsKey("comboBoxTableName"))
             {
-                Controls["comboBoxEntryName"].Visible=visible;
+                Controls["comboBoxTableName"].Visible=visible;
             }
+            if (Controls.ContainsKey("labelTables"))
+            {
+                Controls["labelTables"].Visible = visible;
+            }
+        }
+
+        private void InitializeDropdowns()
+        {
+            comboBoxUnit.Items.AddRange(new string[] { "g/L", "mg/L"});
+            comboBoxUnit.SelectedIndex = 0;
+            comboBoxUnit.SelectedIndexChanged += (s, e) => _selectedUnit = comboBoxUnit.SelectedItem.ToString();
+
+            comboBoxConcentration.Items.AddRange(new string[] { "1", "2", "3", "4", "5" });
+            comboBoxConcentration.SelectedIndex = 0;
+            comboBoxConcentration.SelectedIndexChanged += (s, e) => _selectedConcentration = comboBoxConcentration.SelectedItem.ToString();
         }
 
         private void InitializeEntryNameComboBox(string entryName)
         {
-            comboBoxEntryName.Items.Clear();
+            comboBoxTableName.Items.Clear();
             List<string> tableNames = DatabaseHelper.GetTablesForEntry(entryName);
 
             foreach (string table in tableNames)
             {
-                comboBoxEntryName.Items.Add(table);
+                comboBoxTableName.Items.Add(table);
             }
 
-            if (comboBoxEntryName.Items.Count > 0)
+            if (comboBoxTableName.Items.Count > 0)
             {
-                comboBoxEntryName.SelectedIndex = 0;
+                comboBoxTableName.SelectedIndex = 0;
             }
         }
 
@@ -211,13 +235,6 @@ namespace EnzymkinetikAddIn.Forms
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            if (editMode)
-            {
-                EditTable();
-                _ribbon.LoadDataEntries();
-                this.Close();
-                return;
-            }
             if (string.IsNullOrWhiteSpace(nameTextBox.Text))
             {
                 MessageBox.Show("Bitte Namen für die Tabelle eingeben.", "Fehlender Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -227,18 +244,30 @@ namespace EnzymkinetikAddIn.Forms
 
             try
             {
-                string entryName = comboBoxEntryName.Text;
-                string tablename = nameTextBox.Text.Trim();
-                tablename = Regex.Replace(tablename, @"\s+", "_");
+                string tableName = nameTextBox.Text.Trim();
+                tableName = Regex.Replace(tableName, @"\s+", "_");
 
-                bool success = DatabaseHelper.SaveDataGridViewToDatabase(dataGridViewInputData, tablename, entryName);
-                tablename = DatabaseHelper.StorageName.Replace("_"," ");
-                if (success)
+                // Frage: Soll der Nutzer eine weitere Tabelle hinzufügen?
+                DialogResult result = MessageBox.Show(
+                    "Möchten Sie eine weitere Tabelle hinzufügen?",
+                    "Neue Tabelle",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result == DialogResult.Yes)
                 {
-                    MessageBox.Show("Daten wurden erfolgreich unter " + tablename + " gespeichert.", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    _ribbon.LoadDataEntries();
-                    this.Close();
+                    // Leere Tabelle erstellen und anzeigen
+                    _currentTableIndex = _tableList.Count;
+                    CreateNewTable();
+                    comboBoxTableName.Visible = true; // ComboBox sichtbar machen
+                    UpdateTableSelection();
+                    return;
                 }
+
+                // Falls der Nutzer fertig ist: Speichern aller Tabellen in die Datenbank
+                SaveAllTablesToDatabase();
+                _ribbon.LoadDataEntries();
+                this.Close();
             }
             catch (Exception ex)
             {
@@ -246,9 +275,114 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
-        private void EditTable()
+        // Erstellt eine neue leere Tabelle//Noch Probleme fixen: u.a. Tabelle zu viel wird erstellt
+        private void CreateNewTable()
         {
-            DatabaseHelper.UpdateTableFromDataGridView(dataGridViewInputData,selectedTableName,nameTextBox.Text);
+            _tableList.Add(dataGridViewInputData);
+
+            var location = dataGridViewInputData.Location;
+            var size = dataGridViewInputData.Size;
+            var anchor = dataGridViewInputData.Anchor;
+
+            // Neue DataGridView erstellen
+            dataGridViewInputData = DataGridViewUtility.CreateConfiguredDataGridView(_selectedConcentration, _selectedUnit);
+
+            // Gleiche Position, Größe und Anchor übernehmen
+            dataGridViewInputData.Location = location;
+            dataGridViewInputData.Size = size;
+            dataGridViewInputData.Anchor = anchor;
+
+            // Der Liste hinzufügen
+            _tableList.Add(dataGridViewInputData);
+
+            // In das UI einfügen
+            Controls.Add(dataGridViewInputData);
+            dataGridViewInputData.BringToFront();
+        }
+
+
+
+
+        private void UpdateTableVisibility(int tableIndex)
+        {
+            for (int i = 0; i < _tableList.Count; i++)
+            {
+                _tableList[i].Visible = (i == tableIndex);
+            }
+
+            // Aktuelles Table-Index updaten
+            _currentTableIndex = tableIndex;
+        }
+
+
+
+
+        // Aktualisiert die ComboBox für den Tabellenauswahl
+        private void UpdateTableSelection()
+        {
+            comboBoxTableName.Items.Clear();
+
+            for (int i = 0; i < _tableList.Count; i++)
+            {
+                comboBoxTableName.Items.Add($"Tabelle {i + 1}");
+            }
+
+            // Sicherstellen, dass der Index innerhalb des gültigen Bereichs liegt
+            if (_tableList.Count > 0)
+            {
+                _currentTableIndex = Math.Min(_currentTableIndex, _tableList.Count - 1);
+                comboBoxTableName.SelectedIndex = _currentTableIndex;
+            }
+        }
+
+
+        // Wechselt zwischen gespeicherten Tabellen
+        private void comboBoxTableName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxTableName.SelectedIndex >= 0 && comboBoxTableName.SelectedIndex < _tableList.Count)
+            {
+                // Entferne die aktuell sichtbare Tabelle aus den Controls
+                Controls.Remove(dataGridViewInputData);
+
+                // Wechsle zur gewählten Tabelle aus der Liste
+                dataGridViewInputData = _tableList[comboBoxTableName.SelectedIndex];
+
+                // Füge sie zum UI hinzu
+                Controls.Add(dataGridViewInputData);
+                dataGridViewInputData.BringToFront();
+            }
+        }
+
+
+
+        // Speichert alle Tabellen in die Datenbank
+        private void SaveAllTablesToDatabase()
+        {
+            foreach (var (table, index) in _tableList.Select((t, i) => (t, i)))
+            {
+                string tableName = $"Tabelle_{index + 1}";
+                DatabaseHelper.SaveDataGridViewToDatabase(table, _entryName, tableName);
+            }
+
+            MessageBox.Show("Alle Tabellen wurden erfolgreich gespeichert!", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        // Erstellt eine Kopie eines DataGridView
+        private DataGridView CloneDataGridView(DataGridView original)
+        {
+            DataGridView clone = new DataGridView();
+            foreach (DataGridViewColumn col in original.Columns)
+            {
+                clone.Columns.Add((DataGridViewColumn)col.Clone());
+            }
+            foreach (DataGridViewRow row in original.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    clone.Rows.Add(row.Clone());
+                }
+            }
+            return clone;
         }
 
         public void SetRibbonReference(EnzymRibbon ribbon)
@@ -272,16 +406,6 @@ namespace EnzymkinetikAddIn.Forms
             else
             {
                 e.Handled = true;  // Zeichen blockieren
-            }
-        }
-
-        public void SetCurrentTimeUnit(string timeUnit)
-        {
-            currentTimeUnit = timeUnit;
-
-            if (comboBoxTimeUnit != null && comboBoxTimeUnit.Items.Contains(timeUnit))
-            {
-                comboBoxTimeUnit.SelectedItem = timeUnit;
             }
         }
 
@@ -318,11 +442,9 @@ namespace EnzymkinetikAddIn.Forms
             this.editMode = editMode;
         }
 
-        private void comboBoxEntryName_SelectedIndexChanged(object sender, EventArgs e)
+        internal void SetEntryName(string entryName)
         {
-            string selectedTable = comboBoxEntryName.SelectedItem.ToString();
-            _dataGridManager.LoadTable(selectedTable);
-
+            _entryName = entryName;
         }
     }
 }

@@ -253,6 +253,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Utilities\ComboBoxManager.cs" />
+    <Compile Include="Utilities\DataGridViewUtility.cs" />
     <Compile Include="Utilities\DataTransformer.cs" />
     <Compile Include="Utilities\SampleHelper.cs" />
     <Compile Include="Utilities\DataGridViewTextBoxHandler.cs" />
