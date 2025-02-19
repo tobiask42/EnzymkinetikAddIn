@@ -25,11 +25,23 @@ namespace EnzymkinetikAddIn.Data
 
             _connectionString = $"Data Source={dbPath};Version=3;";
 
-            if (!File.Exists(dbPath))
+            bool dbExists = File.Exists(dbPath);
+
+            if (!dbExists)
             {
                 CreateDatabase(dbPath);
             }
+
+            // Verbindung zur Datenbank öffnen und sicherstellen, dass die "Entries"-Tabelle existiert
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                EnsureEntriesTableExists(conn);
+            }
         }
+
+
+
 
         // SQLite-Verbindung zurückgeben
         private static SQLiteConnection GetConnection() => new SQLiteConnection(_connectionString);
