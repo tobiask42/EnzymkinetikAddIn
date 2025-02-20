@@ -13,22 +13,16 @@ using EnzymkinetikAddIn.Managers;
 
 namespace EnzymkinetikAddIn.Generators
 {
-    internal class EditFormGenerator : IFormGenerator
+    internal class EditFormGenerator
     {
-        public BaseForm GenerateForm(string entryName, string tableName)
+        public BaseForm GenerateForm(string entryName, List<DataTable> tables)
         {
+            DataGridManager dataGridManager = new DataGridManager();
             BaseForm form = new BaseForm();
-            form.setSelectedTableName(tableName.Replace(" ", "_"));
+            form.Name = entryName;
             form.setEditMode(true);
-
-            var dataGridView = form.GetDataGridView();
-            DataGridManager dataGridManager = new DataGridManager(dataGridView);
-            dataGridManager.LoadTable(entryName);
-
-            // Hauptnamen an das BaseForm übergeben!
-            form.ShowcomboBoxTableName(true, tableName);
-
-            form.SetNameText(tableName);
+            List<DataGridView> dataGridViews = dataGridManager.GetDataGridViews(tables);
+            form.SetTableList(dataGridViews);
             return form;
         }
     }
