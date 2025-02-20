@@ -58,8 +58,7 @@ namespace EnzymkinetikAddIn.Data
             using (var conn = GetConnection())
             {
                 conn.Open();
-                int entryId = GetOrCreateEntryId(conn, entryName); // Hier wird EntryID ermittelt
-
+                int entryId = GetOrCreateEntryId(conn, entryName);
                 string tableName = $"{entryName}_{tableSuffix}".Replace(" ", "_");
 
                 using (var transaction = conn.BeginTransaction())
@@ -67,7 +66,9 @@ namespace EnzymkinetikAddIn.Data
                     try
                     {
                         CreateTable(conn, dgv, tableName, entryId);
-                        InsertRows(conn, dgv, tableName, entryId); // Jetzt mit entryId
+                        InsertRows(conn, dgv, tableName, entryId);
+
+                        SaveTableName(conn, entryId, tableName); // Tabellennamen speichern
 
                         transaction.Commit();
                         return true;
@@ -81,6 +82,8 @@ namespace EnzymkinetikAddIn.Data
                 }
             }
         }
+
+
 
 
 
@@ -111,24 +114,32 @@ namespace EnzymkinetikAddIn.Data
             {
                 if (row.IsNewRow) continue;
 
+                // Spaltennamen und Platzhalter vorbereiten
                 var columnNames = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>()
                     .Select(c => $"[{SanitizeColumnName(c.HeaderText)}]"));
-                var values = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>().Select(_ => "?"));
+                var paramPlaceholders = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>()
+                    .Select((c, index) => $"@param{index}"));
 
-                string insertQuery = $"INSERT INTO {tableName} (EntryID, {columnNames}) VALUES (@entryId, {values})";
+                // SQL-Query erstellen
+                string insertQuery = $"INSERT INTO {tableName} (EntryID, {columnNames}) VALUES (@entryId, {paramPlaceholders})";
 
                 using (var cmd = new SQLiteCommand(insertQuery, conn))
                 {
+                    // Parameter für EntryID hinzufügen
                     cmd.Parameters.AddWithValue("@entryId", entryId);
-                    foreach (DataGridViewColumn col in dgv.Columns)
+
+                    // Parameter für die Zellen hinzufügen
+                    for (int i = 0; i < dgv.Columns.Count; i++)
                     {
-                        object value = row.Cells[col.Index].Value ?? DBNull.Value;
-                        cmd.Parameters.AddWithValue($"@{SanitizeColumnName(col.HeaderText)}", ConvertToSqlValue(value));
+                        object value = row.Cells[i].Value ?? DBNull.Value;
+                        cmd.Parameters.AddWithValue($"@param{i}", ConvertToSqlValue(value) ?? DBNull.Value);
                     }
-                    cmd.ExecuteNonQuery();
+
+                    cmd.ExecuteNonQuery(); // SQL-Statement ausführen
                 }
             }
         }
+
 
 
 
@@ -210,35 +221,76 @@ namespace EnzymkinetikAddIn.Data
 
 
         // Tabelle laden und zurückgeben
-        public static DataTable LoadTable(string tableName)
+        public static List<DataTable> LoadTablesForEntry(string entryName)
         {
+            List<DataTable> dataTables = new List<DataTable>();
+
             using (var conn = GetConnection())
             {
                 conn.Open();
-                tableName = tableName.Replace(" ", "_");
 
-                var columnNames = new List<string>();
-                using (var cmd = new SQLiteCommand($"PRAGMA table_info({tableName});", conn))
-                using (var reader = cmd.ExecuteReader())
+                // Hole alle Tabellennamen, die zu diesem Entry gehören
+                string query = @"
+                SELECT TableName 
+                FROM EntryTables 
+                INNER JOIN Entries ON EntryTables.EntryID = Entries.ID 
+                WHERE Entries.Name = @entryName;";
+
+                List<string> tableNames = new List<string>();
+
+                using (var cmd = new SQLiteCommand(query, conn))
                 {
-                    while (reader.Read())
+                    cmd.Parameters.AddWithValue("@entryName", entryName);
+
+                    using (var reader = cmd.ExecuteReader())
                     {
-                        string columnName = reader["name"].ToString();
-                        if (columnName != "ID") columnNames.Add(columnName);
+                        while (reader.Read())
+                        {
+                            tableNames.Add(reader.GetString(0));
+                        }
                     }
                 }
 
-                string selectQuery = $"SELECT {string.Join(", ", columnNames)} FROM [{tableName}]";
-
-                using (var cmd = new SQLiteCommand(selectQuery, conn))
-                using (var adapter = new SQLiteDataAdapter(cmd))
+                // Lade die Inhalte jeder Tabelle in ein DataTable
+                foreach (string tableName in tableNames)
                 {
                     DataTable dt = new DataTable();
-                    adapter.Fill(dt);
-                    return dt;
+                    var columnNames = new List<string>();
+
+                    using (var cmd = new SQLiteCommand($"PRAGMA table_info([{tableName}]);", conn))
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string columnName = reader["name"].ToString();
+                            if (columnName != "ID" && columnName != "EntryID")
+                                columnNames.Add(columnName);
+                        }
+                    }
+
+                    if (!columnNames.Any())
+                        throw new Exception($"Keine Spalten gefunden in Tabelle: {tableName}");
+
+                    string selectQuery = $"SELECT {string.Join(", ", columnNames.Select(c => $"[{c}]"))} FROM [{tableName}]";
+
+                    using (var cmd = new SQLiteCommand(selectQuery, conn))
+                    using (var adapter = new SQLiteDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                        dt.TableName = tableName; // Speichert den Tabellennamen im DataTable
+                    }
+
+                    dataTables.Add(dt);
                 }
             }
+
+            return dataTables;
         }
+
+
+
+
+
 
         // Tabelle umbenennen
         public static void RenameTable(string oldName, string newName)
@@ -254,6 +306,7 @@ namespace EnzymkinetikAddIn.Data
             }
         }
 
+        // TODO: Für neue Integration der Datenbank anpassen
         public static bool UpdateTableFromDataGridView(DataGridView dataGridView, string entryName, string tableSuffix)
         {
             string tableName = $"{entryName}_{tableSuffix}".Replace(" ", "_");
@@ -262,7 +315,7 @@ namespace EnzymkinetikAddIn.Data
             try
             {
                 DeleteTable(tableName);
-                SaveDataGridViewToDatabase(dataGridView, entryName, tableSuffix); // Fix: tableSuffix hinzugefügt
+                SaveDataGridViewToDatabase(dataGridView, entryName, tableSuffix);
                 return true;
             }
             catch (Exception ex)
@@ -290,15 +343,30 @@ namespace EnzymkinetikAddIn.Data
         private static void EnsureEntriesTableExists(SQLiteConnection conn)
         {
             string createEntriesTableQuery = @"
-        CREATE TABLE IF NOT EXISTS Entries (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            Name TEXT UNIQUE NOT NULL
-        );";
+            CREATE TABLE IF NOT EXISTS Entries (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name TEXT UNIQUE NOT NULL
+            );";
+
             using (var cmd = new SQLiteCommand(createEntriesTableQuery, conn))
             {
                 cmd.ExecuteNonQuery();
             }
+
+            string createEntryTablesQuery = @"
+            CREATE TABLE IF NOT EXISTS EntryTables (
+                ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                EntryID INTEGER NOT NULL,
+                TableName TEXT NOT NULL,
+                FOREIGN KEY (EntryID) REFERENCES Entries(ID) ON DELETE CASCADE
+            );";
+
+            using (var cmd = new SQLiteCommand(createEntryTablesQuery, conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
         }
+
 
         private static int GetOrCreateEntryId(SQLiteConnection conn, string entryName)
         {
@@ -332,18 +400,22 @@ namespace EnzymkinetikAddIn.Data
             using (var conn = GetConnection())
             {
                 conn.Open();
-                string query = "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE @entryNamePattern";
+
+                string query = @"
+                SELECT TableName 
+                FROM EntryTables 
+                INNER JOIN Entries ON EntryTables.EntryID = Entries.ID 
+                WHERE Entries.Name = @entryName;";
 
                 using (var cmd = new SQLiteCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@entryNamePattern", entryName + "_%");
+                    cmd.Parameters.AddWithValue("@entryName", entryName);
 
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            string tableName = reader.GetString(0);
-                            tableNames.Add(tableName.Replace(entryName + "_", "")); // Suffix extrahieren
+                            tableNames.Add(reader.GetString(0));
                         }
                     }
                 }
@@ -351,6 +423,7 @@ namespace EnzymkinetikAddIn.Data
 
             return tableNames;
         }
+
 
 
         public static List<string> GetEntryNames()
@@ -374,5 +447,20 @@ namespace EnzymkinetikAddIn.Data
 
             return entryNames;
         }
+
+        private static void SaveTableName(SQLiteConnection conn, int entryId, string tableName)
+        {
+            string insertQuery = "INSERT INTO EntryTables (EntryID, TableName) VALUES (@entryId, @tableName);";
+
+            using (var cmd = new SQLiteCommand(insertQuery, conn))
+            {
+                cmd.Parameters.AddWithValue("@entryId", entryId);
+                cmd.Parameters.AddWithValue("@tableName", tableName);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+
+
     }
 }
