@@ -22,10 +22,10 @@ namespace EnzymkinetikAddIn.Factories
             return _dataSetGenerator.GenerateForm(concentration, unit);
         }
 
-        public BaseForm CreateEditForm(string entryName, string tableName)
+        public BaseForm CreateEditForm(string entryName, List<DataTable> tables)
         {
             EditFormGenerator _editFormGenerator = new EditFormGenerator();
-            return _editFormGenerator.GenerateForm(entryName, tableName);
+            return _editFormGenerator.GenerateForm(entryName, tables);
         }
     }
 }
