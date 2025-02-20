@@ -40,6 +40,8 @@ namespace EnzymkinetikAddIn.Forms
             _comboBoxManager = new ComboBoxManager(comboBoxTimeUnit, labelTimeUnit);
             UpdateComboBoxVisibility();
             InitializeDropdowns();
+            _selectedConcentration = comboBoxConcentration.Text;
+            _selectedUnit = comboBoxUnit.Text;
 
         }
 
@@ -275,15 +277,17 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
-        // Erstellt eine neue leere Tabelle//Noch Probleme fixen: u.a. Tabelle zu viel wird erstellt
+        // Erstellt eine neue leere Tabelle
         private void CreateNewTable()
         {
-            _tableList.Add(dataGridViewInputData);
+            if (_tableList.Count < 1)
+            {
+                _tableList.Add(dataGridViewInputData);
+            }
 
             var location = dataGridViewInputData.Location;
             var size = dataGridViewInputData.Size;
             var anchor = dataGridViewInputData.Anchor;
-
             // Neue DataGridView erstellen
             dataGridViewInputData = DataGridViewUtility.CreateConfiguredDataGridView(_selectedConcentration, _selectedUnit);
 
@@ -298,20 +302,6 @@ namespace EnzymkinetikAddIn.Forms
             // In das UI einfügen
             Controls.Add(dataGridViewInputData);
             dataGridViewInputData.BringToFront();
-        }
-
-
-
-
-        private void UpdateTableVisibility(int tableIndex)
-        {
-            for (int i = 0; i < _tableList.Count; i++)
-            {
-                _tableList[i].Visible = (i == tableIndex);
-            }
-
-            // Aktuelles Table-Index updaten
-            _currentTableIndex = tableIndex;
         }
 
 
@@ -365,24 +355,6 @@ namespace EnzymkinetikAddIn.Forms
             }
 
             MessageBox.Show("Alle Tabellen wurden erfolgreich gespeichert!", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        // Erstellt eine Kopie eines DataGridView
-        private DataGridView CloneDataGridView(DataGridView original)
-        {
-            DataGridView clone = new DataGridView();
-            foreach (DataGridViewColumn col in original.Columns)
-            {
-                clone.Columns.Add((DataGridViewColumn)col.Clone());
-            }
-            foreach (DataGridViewRow row in original.Rows)
-            {
-                if (!row.IsNewRow)
-                {
-                    clone.Rows.Add(row.Clone());
-                }
-            }
-            return clone;
         }
 
         public void SetRibbonReference(EnzymRibbon ribbon)
@@ -445,6 +417,11 @@ namespace EnzymkinetikAddIn.Forms
         internal void SetEntryName(string entryName)
         {
             _entryName = entryName;
+        }
+
+        private void comboBoxConcentration_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _selectedConcentration = comboBoxConcentration.Text;
         }
     }
 }

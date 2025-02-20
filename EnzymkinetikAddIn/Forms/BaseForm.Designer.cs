@@ -118,6 +118,7 @@
             this.comboBoxConcentration.Name = "comboBoxConcentration";
             this.comboBoxConcentration.Size = new System.Drawing.Size(121, 21);
             this.comboBoxConcentration.TabIndex = 7;
+            this.comboBoxConcentration.SelectedIndexChanged += new System.EventHandler(this.comboBoxConcentration_SelectedIndexChanged);
             // 
             // comboBoxUnit
             // 
