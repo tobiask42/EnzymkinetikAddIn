@@ -36,7 +36,6 @@ namespace EnzymkinetikAddIn.Forms
         public BaseForm()
         {
             InitializeComponent();
-            _dataGridManager = new DataGridManager(GetDataGridView());
             _comboBoxManager = new ComboBoxManager(comboBoxTimeUnit, labelTimeUnit);
             UpdateComboBoxVisibility();
             InitializeDropdowns();
@@ -422,6 +421,11 @@ namespace EnzymkinetikAddIn.Forms
         private void comboBoxConcentration_SelectedIndexChanged(object sender, EventArgs e)
         {
             _selectedConcentration = comboBoxConcentration.Text;
+        }
+
+        public void SetTableList(List<DataGridView> dataGridViews)
+        {
+            _tableList = dataGridViews;
         }
     }
 }
