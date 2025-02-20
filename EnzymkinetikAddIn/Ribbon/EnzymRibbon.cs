@@ -159,10 +159,9 @@ namespace EnzymkinetikAddIn.Ribbon
             if (dropDownDataSet.SelectedItem == null) return;
 
             string selectedEntry = dropDownDataSet.SelectedItem.Label; // Hauptname holen
-            string selectedTable = ""; // Hier müsste die Logik rein, wie der Benutzer eine Tabelle auswählt
-
+            List<DataTable> tables = new List<DataTable>();
             FormFactory factory = new FormFactory();
-            BaseForm editForm = factory.CreateEditForm(selectedEntry, selectedTable);
+            BaseForm editForm = factory.CreateEditForm(selectedEntry, tables);
             editForm.Show();
         }
 
