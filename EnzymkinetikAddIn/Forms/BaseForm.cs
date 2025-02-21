@@ -77,15 +77,18 @@ namespace EnzymkinetikAddIn.Forms
             if (_tableList.Count > 1)
             {
                 _tableList.RemoveAt(index);
+                _tablenames.RemoveAt(index);
             }
             else if(_tableList.Count == 1)
             {
                 _tableList.RemoveAt(index);
+                _tablenames.RemoveAt(index);
                 Controls.Remove(dataGridViewInputData);
-                saveButton.Text = "Tabelle erstellen";
+                saveButton.Enabled = false;
                 deleteButton.Enabled = false;
                 comboBoxTableName.Enabled = false;
                 comboBoxTableName.Text = "Kein Eintrag";
+
                 DeleteDataset();
             }
             else
@@ -287,14 +290,6 @@ namespace EnzymkinetikAddIn.Forms
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            if (_tableList.Count == 0)
-            {
-                deleteButton.Enabled = true;
-                saveButton.Text = "Speichern";
-                CreateNewTable(true);
-            }
-
-
             try
             {
                 string tableName = nameTextBox.Text.Trim();
@@ -320,20 +315,13 @@ namespace EnzymkinetikAddIn.Forms
             _currentTableIndex = _tableList.Count;
             CreateNewTable();
             UpdateTableSelection();
+            saveButton.Enabled = true;
+            comboBoxTableName.Enabled = true;
         }
 
         // Erstellt eine neue leere Tabelle
-        private void CreateNewTable(bool empty = false)
+        private void CreateNewTable()
         {
-            if (_tableList.Count < 1 && empty == false)
-            {
-                _tableList.Add(dataGridViewInputData);
-            }
-            if (empty)
-            {
-                comboBoxTableName.Enabled = true;
-                deleteButton.Enabled = true;
-            }
             // Neue DataGridView erstellen
             dataGridViewInputData = DataGridViewUtility.CreateConfiguredDataGridView(_selectedConcentration, _selectedUnit);
 
@@ -344,6 +332,7 @@ namespace EnzymkinetikAddIn.Forms
 
             // Der Liste hinzufügen
             _tableList.Add(dataGridViewInputData);
+            _tablenames.Add(nameTextBox.Text);
 
             // In das UI einfügen
             Controls.Add(dataGridViewInputData);
@@ -351,6 +340,7 @@ namespace EnzymkinetikAddIn.Forms
 
             // ComboBox refreshen
             UpdateTableSelection();
+            deleteButton.Enabled = true;
         }
 
 
@@ -363,7 +353,7 @@ namespace EnzymkinetikAddIn.Forms
 
             for (int i = 0; i < _tableList.Count; i++)
             {
-                comboBoxTableName.Items.Add($"Tabelle {i + 1}");
+                comboBoxTableName.Items.Add(_tablenames[i]);
             }
 
             // Sicherstellen, dass der Index innerhalb des gültigen Bereichs liegt
@@ -404,8 +394,8 @@ namespace EnzymkinetikAddIn.Forms
         {
             foreach (var (table, index) in _tableList.Select((t, i) => (t, i)))
             {
-                string tableName = $"Tabelle_{index + 1}";
-                DatabaseHelper.SaveDataGridViewToDatabase(table, _entryName, tableName);
+                string tableName = _tablenames[index];
+                DatabaseHelper.SaveDataGridViewToDatabase(table, _entryName, _tablenames[index]);
             }
 
             MessageBox.Show("Alle Tabellen wurden erfolgreich gespeichert!", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -475,6 +465,13 @@ namespace EnzymkinetikAddIn.Forms
             dataGridViewInputData.Size = _size;
             dataGridViewInputData.Anchor = _anchor;
 
+            UpdateTableSelection();
+        }
+
+        public void SetTableNames(List<String> tableNames)
+        {
+            _tablenames = tableNames;
+            _tableList.Add(dataGridViewInputData);
             UpdateTableSelection();
         }
 
