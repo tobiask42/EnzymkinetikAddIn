@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EnzymkinetikAddIn.Data;
+using EnzymkinetikAddIn.Generators;
 using EnzymkinetikAddIn.Interfaces;
 using EnzymkinetikAddIn.Managers;
 using EnzymkinetikAddIn.Ribbon;
@@ -33,15 +34,65 @@ namespace EnzymkinetikAddIn.Forms
         private string _selectedUnit;
         private string _selectedConcentration;
         private readonly ComboBoxManager _comboBoxManager;
+        private readonly Point _location;
+        private readonly Size _size;
+        private readonly AnchorStyles _anchor;
+        private InputFormGenerator _inputFormGenerator;
+        private List<String> _tablenames = new List<String>();
         public BaseForm()
         {
             InitializeComponent();
+            _location = dataGridViewInputData.Location;
+            _size = dataGridViewInputData.Size;
+            _anchor = dataGridViewInputData.Anchor;
             _comboBoxManager = new ComboBoxManager(comboBoxTimeUnit, labelTimeUnit);
             UpdateComboBoxVisibility();
             InitializeDropdowns();
             _selectedConcentration = comboBoxConcentration.Text;
             _selectedUnit = comboBoxUnit.Text;
+            InitializeDeleteContextMenu();
 
+        }
+
+        private void InitializeDeleteContextMenu()
+        {
+            deleteContextMenuStrip.Items.Add("Tabelle löschen", null, (s, ev) => DeleteTable());
+            deleteContextMenuStrip.Items.Add("Datensatz löschen", null, (s, ev) => DeleteDataset());
+
+            deleteButton.Click += (s, ev) => deleteContextMenuStrip.Show(deleteButton, new Point(0, deleteButton.Height));
+
+        }
+
+        private void DeleteDataset()
+        {
+            MessageBox.Show("Datensatz " + _entryName + " löschen");
+            // TODO: mit DatabaseHelper verbinden
+        }
+
+        private void DeleteTable()
+        {
+            MessageBox.Show(comboBoxTableName.Text);
+            selectedTableName = comboBoxTableName.Text;
+            int index = comboBoxTableName.SelectedIndex;
+            if (_tableList.Count > 1)
+            {
+                _tableList.RemoveAt(index);
+            }
+            else if(_tableList.Count == 1)
+            {
+                _tableList.RemoveAt(index);
+                Controls.Remove(dataGridViewInputData);
+                saveButton.Text = "Tabelle erstellen";
+                deleteButton.Enabled = false;
+                comboBoxTableName.Enabled = false;
+                comboBoxTableName.Text = "Kein Eintrag";
+                DeleteDataset();
+            }
+            else
+            {
+                throw new Exception("Keine Tabellen vorhanden");
+            }
+            UpdateTableSelection();
         }
 
         public void ShowcomboBoxTableName(bool visible, string entryName)
@@ -236,36 +287,18 @@ namespace EnzymkinetikAddIn.Forms
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(nameTextBox.Text))
+            if (_tableList.Count == 0)
             {
-                MessageBox.Show("Bitte Namen für die Tabelle eingeben.", "Fehlender Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                nameTextBox.Focus();
-                return;
+                deleteButton.Enabled = true;
+                saveButton.Text = "Speichern";
+                CreateNewTable(true);
             }
+
 
             try
             {
                 string tableName = nameTextBox.Text.Trim();
                 tableName = Regex.Replace(tableName, @"\s+", "_");
-
-                // Frage: Soll der Nutzer eine weitere Tabelle hinzufügen?
-                DialogResult result = MessageBox.Show(
-                    "Möchten Sie eine weitere Tabelle hinzufügen?",
-                    "Neue Tabelle",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
-                {
-                    // Leere Tabelle erstellen und anzeigen
-                    _currentTableIndex = _tableList.Count;
-                    CreateNewTable();
-                    comboBoxTableName.Visible = true; // ComboBox sichtbar machen
-                    UpdateTableSelection();
-                    return;
-                }
-
-                // Falls der Nutzer fertig ist: Speichern aller Tabellen in die Datenbank
                 SaveAllTablesToDatabase();
                 _ribbon.LoadDataEntries();
                 this.Close();
@@ -276,24 +309,38 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
-        // Erstellt eine neue leere Tabelle
-        private void CreateNewTable()
+        private void tableSaveButton_Click(object sender, EventArgs e)
         {
-            if (_tableList.Count < 1)
+            if (string.IsNullOrWhiteSpace(nameTextBox.Text))
+            {
+                MessageBox.Show("Bitte Namen für die Tabelle eingeben.", "Fehlender Name", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                nameTextBox.Focus();
+                return;
+            }
+            _currentTableIndex = _tableList.Count;
+            CreateNewTable();
+            UpdateTableSelection();
+        }
+
+        // Erstellt eine neue leere Tabelle
+        private void CreateNewTable(bool empty = false)
+        {
+            if (_tableList.Count < 1 && empty == false)
             {
                 _tableList.Add(dataGridViewInputData);
             }
-
-            var location = dataGridViewInputData.Location;
-            var size = dataGridViewInputData.Size;
-            var anchor = dataGridViewInputData.Anchor;
+            if (empty)
+            {
+                comboBoxTableName.Enabled = true;
+                deleteButton.Enabled = true;
+            }
             // Neue DataGridView erstellen
             dataGridViewInputData = DataGridViewUtility.CreateConfiguredDataGridView(_selectedConcentration, _selectedUnit);
 
             // Gleiche Position, Größe und Anchor übernehmen
-            dataGridViewInputData.Location = location;
-            dataGridViewInputData.Size = size;
-            dataGridViewInputData.Anchor = anchor;
+            dataGridViewInputData.Location = _location;
+            dataGridViewInputData.Size = _size;
+            dataGridViewInputData.Anchor = _anchor;
 
             // Der Liste hinzufügen
             _tableList.Add(dataGridViewInputData);
@@ -301,6 +348,9 @@ namespace EnzymkinetikAddIn.Forms
             // In das UI einfügen
             Controls.Add(dataGridViewInputData);
             dataGridViewInputData.BringToFront();
+
+            // ComboBox refreshen
+            UpdateTableSelection();
         }
 
 
@@ -330,9 +380,6 @@ namespace EnzymkinetikAddIn.Forms
         {
             if (comboBoxTableName.SelectedIndex >= 0 && comboBoxTableName.SelectedIndex < _tableList.Count)
             {
-                var location = dataGridViewInputData.Location;
-                var size = dataGridViewInputData.Size;
-                var anchor = dataGridViewInputData.Anchor;
 
                 // Entferne die aktuell sichtbare Tabelle aus den Controls
                 Controls.Remove(dataGridViewInputData);
@@ -340,9 +387,9 @@ namespace EnzymkinetikAddIn.Forms
                 // Wechsle zur gewählten Tabelle aus der Liste
                 dataGridViewInputData = _tableList[comboBoxTableName.SelectedIndex];
 
-                dataGridViewInputData.Location = location;
-                dataGridViewInputData.Size = size;
-                dataGridViewInputData.Anchor = anchor;
+                dataGridViewInputData.Location = _location;
+                dataGridViewInputData.Size = _size;
+                dataGridViewInputData.Anchor = _anchor;
 
                 // Füge sie zum UI hinzu
                 Controls.Add(dataGridViewInputData);
@@ -388,19 +435,6 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
-        public void SetNameText(string name)
-        {
-            nameTextBox.Text = name;
-        }
-
-        private void deleteButton_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show(selectedTableName);
-            DatabaseHelper.DeleteTable(selectedTableName);
-            _ribbon.LoadDataEntries();
-            this.Close();
-        }
-
         public void showDeleteButton(bool showDelete)
         {
             deleteButton.Visible = showDelete;
@@ -431,20 +465,19 @@ namespace EnzymkinetikAddIn.Forms
             _selectedConcentration = comboBoxConcentration.Text;
         }
 
-        public void SetTableList(List<DataGridView> dataGridViews, DataGridView baseDataGridView)
+        public void SetTableList(List<DataGridView> dataGridViews, List<String> tablenames = null)
         {
             _tableList = dataGridViews;
-            var location = baseDataGridView.Location;
-            var size = baseDataGridView.Size;
-            var anchor = baseDataGridView.Anchor;
+            _tablenames = tablenames;
             DataGridView firstDataGridView = dataGridViews.First();
             dataGridViewInputData = firstDataGridView;
-
-            dataGridViewInputData.Location = location;
-            dataGridViewInputData.Size = size;
-            dataGridViewInputData.Anchor = anchor;
+            dataGridViewInputData.Location = _location;
+            dataGridViewInputData.Size = _size;
+            dataGridViewInputData.Anchor = _anchor;
 
             UpdateTableSelection();
         }
+
+
     }
 }

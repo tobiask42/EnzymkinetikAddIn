@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.dataGridViewInputData = new System.Windows.Forms.DataGridView();
             this.labelTimeUnit = new System.Windows.Forms.Label();
             this.comboBoxTimeUnit = new System.Windows.Forms.ComboBox();
@@ -41,6 +42,8 @@
             this.labelConc = new System.Windows.Forms.Label();
             this.labelUnit = new System.Windows.Forms.Label();
             this.labelTables = new System.Windows.Forms.Label();
+            this.deleteContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tableSaveButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewInputData)).BeginInit();
             this.SuspendLayout();
             // 
@@ -76,7 +79,7 @@
             // 
             // nameTextBox
             // 
-            this.nameTextBox.Location = new System.Drawing.Point(496, 402);
+            this.nameTextBox.Location = new System.Drawing.Point(378, 405);
             this.nameTextBox.Name = "nameTextBox";
             this.nameTextBox.Size = new System.Drawing.Size(100, 20);
             this.nameTextBox.TabIndex = 3;
@@ -88,22 +91,22 @@
             this.saveButton.Name = "saveButton";
             this.saveButton.Size = new System.Drawing.Size(75, 23);
             this.saveButton.TabIndex = 4;
-            this.saveButton.Text = "Speichern";
+            this.saveButton.Text = "Datensatz Speichern";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
             // deleteButton
             // 
-            this.deleteButton.Location = new System.Drawing.Point(357, 401);
+            this.deleteButton.Location = new System.Drawing.Point(294, 401);
             this.deleteButton.Name = "deleteButton";
             this.deleteButton.Size = new System.Drawing.Size(75, 23);
             this.deleteButton.TabIndex = 5;
             this.deleteButton.Text = "Löschen";
             this.deleteButton.UseVisualStyleBackColor = true;
-            this.deleteButton.Click += new System.EventHandler(this.deleteButton_Click);
             // 
             // comboBoxTableName
             // 
+            this.comboBoxTableName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxTableName.FormattingEnabled = true;
             this.comboBoxTableName.Location = new System.Drawing.Point(502, 30);
             this.comboBoxTableName.Name = "comboBoxTableName";
@@ -113,6 +116,7 @@
             // 
             // comboBoxConcentration
             // 
+            this.comboBoxConcentration.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxConcentration.FormattingEnabled = true;
             this.comboBoxConcentration.Location = new System.Drawing.Point(248, 30);
             this.comboBoxConcentration.Name = "comboBoxConcentration";
@@ -122,6 +126,7 @@
             // 
             // comboBoxUnit
             // 
+            this.comboBoxUnit.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxUnit.FormattingEnabled = true;
             this.comboBoxUnit.Location = new System.Drawing.Point(375, 30);
             this.comboBoxUnit.Name = "comboBoxUnit";
@@ -164,11 +169,27 @@
             this.labelTables.TabIndex = 12;
             this.labelTables.Text = "Tabelle";
             // 
+            // deleteContextMenuStrip
+            // 
+            this.deleteContextMenuStrip.Name = "contextMenuStrip1";
+            this.deleteContextMenuStrip.Size = new System.Drawing.Size(61, 4);
+            // 
+            // tableSaveButton
+            // 
+            this.tableSaveButton.Location = new System.Drawing.Point(505, 401);
+            this.tableSaveButton.Name = "tableSaveButton";
+            this.tableSaveButton.Size = new System.Drawing.Size(126, 23);
+            this.tableSaveButton.TabIndex = 13;
+            this.tableSaveButton.Text = "Tabelle hinzufügen";
+            this.tableSaveButton.UseVisualStyleBackColor = true;
+            this.tableSaveButton.Click += new System.EventHandler(this.tableSaveButton_Click);
+            // 
             // BaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.tableSaveButton);
             this.Controls.Add(this.labelTables);
             this.Controls.Add(this.labelUnit);
             this.Controls.Add(this.labelConc);
@@ -206,5 +227,7 @@
         private System.Windows.Forms.Label labelConc;
         private System.Windows.Forms.Label labelUnit;
         private System.Windows.Forms.Label labelTables;
+        private System.Windows.Forms.ContextMenuStrip deleteContextMenuStrip;
+        private System.Windows.Forms.Button tableSaveButton;
     }
 }
