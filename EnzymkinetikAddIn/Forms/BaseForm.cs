@@ -330,11 +330,19 @@ namespace EnzymkinetikAddIn.Forms
         {
             if (comboBoxTableName.SelectedIndex >= 0 && comboBoxTableName.SelectedIndex < _tableList.Count)
             {
+                var location = dataGridViewInputData.Location;
+                var size = dataGridViewInputData.Size;
+                var anchor = dataGridViewInputData.Anchor;
+
                 // Entferne die aktuell sichtbare Tabelle aus den Controls
                 Controls.Remove(dataGridViewInputData);
 
                 // Wechsle zur gewählten Tabelle aus der Liste
                 dataGridViewInputData = _tableList[comboBoxTableName.SelectedIndex];
+
+                dataGridViewInputData.Location = location;
+                dataGridViewInputData.Size = size;
+                dataGridViewInputData.Anchor = anchor;
 
                 // Füge sie zum UI hinzu
                 Controls.Add(dataGridViewInputData);
@@ -423,9 +431,20 @@ namespace EnzymkinetikAddIn.Forms
             _selectedConcentration = comboBoxConcentration.Text;
         }
 
-        public void SetTableList(List<DataGridView> dataGridViews)
+        public void SetTableList(List<DataGridView> dataGridViews, DataGridView baseDataGridView)
         {
             _tableList = dataGridViews;
+            var location = baseDataGridView.Location;
+            var size = baseDataGridView.Size;
+            var anchor = baseDataGridView.Anchor;
+            DataGridView firstDataGridView = dataGridViews.First();
+            dataGridViewInputData = firstDataGridView;
+
+            dataGridViewInputData.Location = location;
+            dataGridViewInputData.Size = size;
+            dataGridViewInputData.Anchor = anchor;
+
+            UpdateTableSelection();
         }
     }
 }

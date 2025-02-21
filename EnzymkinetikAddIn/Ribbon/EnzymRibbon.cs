@@ -124,7 +124,7 @@ namespace EnzymkinetikAddIn.Ribbon
             string unit = dropDownUnit.SelectedItem.Label;
 
             var form = _formFactory.CreateForm(concentration, unit);
-            form.SetEntryName(entryName); // Dies muss in der Form-Klasse implementiert werden
+            form.SetEntryName(entryName);
             form.SetRibbonReference(this);
             form.ShowDialog();
         }
@@ -159,7 +159,7 @@ namespace EnzymkinetikAddIn.Ribbon
             if (dropDownDataSet.SelectedItem == null) return;
 
             string selectedEntry = dropDownDataSet.SelectedItem.Label; // Hauptname holen
-            List<DataTable> tables = new List<DataTable>();
+            List<DataTable> tables = DatabaseHelper.LoadTablesForEntry(selectedEntry);
             FormFactory factory = new FormFactory();
             BaseForm editForm = factory.CreateEditForm(selectedEntry, tables);
             editForm.Show();
