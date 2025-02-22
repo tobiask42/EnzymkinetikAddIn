@@ -10,10 +10,22 @@ namespace EnzymkinetikAddIn.Utilities
 {
     internal class DataTransformer
     {
-        // TODO: Für neue Datenbankstruktur anpassen
-        public static DataTable TransformFromDatabase(string tableName)
+        public static Dictionary<string, DataTable> TransformFromDatabase(string entryName)
         {
-            DataTable oldTableData = null;
+            List<DataTable> tables = DatabaseHelper.LoadTablesForEntry(entryName);
+            Dictionary<string,DataTable> result = new Dictionary<string, DataTable> ();
+            List<string> tablenames = DatabaseHelper.GetTableNamesByEntryName(entryName);
+            for (int i = 0; i < tables.Count; i++)
+            {
+                DataTable transformedTable = TransformDataTable(tables[i]);
+                result[tablenames[i]] = transformedTable;
+            }
+
+            return result;
+        }
+
+        private static DataTable TransformDataTable(DataTable oldTableData)
+        {
             DataTable newTableData = new DataTable();
 
             Dictionary<string, string> columnMappings = new Dictionary<string, string>(); // Alt -> Neu Zuordnung
@@ -90,6 +102,5 @@ namespace EnzymkinetikAddIn.Utilities
 
             return newTableData;
         }
-
     }
 }
