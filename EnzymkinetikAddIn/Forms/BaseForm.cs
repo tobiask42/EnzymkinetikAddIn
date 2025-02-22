@@ -69,6 +69,7 @@ namespace EnzymkinetikAddIn.Forms
             if (editMode)
             {
                 DatabaseHelper.DeleteEntryWithTablesByName(_entryName);
+                _ribbon.LoadDataEntries();
             }            
             this.Close();
         }
@@ -353,11 +354,18 @@ namespace EnzymkinetikAddIn.Forms
         // Aktualisiert die ComboBox für den Tabellenauswahl
         private void UpdateTableSelection()
         {
+            if (_tablenames == null)
+            {
+                MessageBox.Show("tablenames is null");
+                return;
+            } else if (_tablenames.Count() == 0)
+            {
+                MessageBox.Show("tablenames is empty");
+            }
+            MessageBox.Show("tablenames size: " + _tablenames.Count());
             comboBoxTableName.Items.Clear();
-            MessageBox.Show("tablenames: " + _tablenames.Count() + " tablelist: " + _tableList.Count);
             for (int i = 0; i < _tableList.Count; i++)
             {
-                MessageBox.Show("Tablename[0] =" + _tablenames[0]);
                 comboBoxTableName.Items.Add(_tablenames[i]);
             }
 
@@ -395,16 +403,21 @@ namespace EnzymkinetikAddIn.Forms
 
 
         // Speichert alle Tabellen in die Datenbank
-        private void SaveAllTablesToDatabase()
+        public void SaveAllTablesToDatabase()
         {
-            foreach (var (table, index) in _tableList.Select((t, i) => (t, i)))
-            {
-                string tableName = _tablenames[index];
-                DatabaseHelper.SaveDataGridViewToDatabase(table, _entryName, _tablenames[index]);
-            }
+            // Alle Tabellen speichern, aber der DatabaseHelper kümmert sich um das Löschen und Speichern
+            bool success = DatabaseHelper.SaveAllTablesToDatabase(_entryName, _tableList, _tablenames);
 
-            MessageBox.Show("Alle Tabellen wurden erfolgreich gespeichert!", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (success)
+            {
+                MessageBox.Show("Alle Tabellen wurden erfolgreich gespeichert!", "Speichern erfolgreich", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Es gab einen Fehler beim Speichern der Tabellen.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
+
 
         public void SetRibbonReference(EnzymRibbon ribbon)
         {
@@ -452,6 +465,7 @@ namespace EnzymkinetikAddIn.Forms
 
         internal void SetEntryName(string entryName)
         {
+            MessageBox.Show("Setting entryName:" + entryName);
             _entryName = entryName;
         }
 
@@ -460,21 +474,41 @@ namespace EnzymkinetikAddIn.Forms
             _selectedConcentration = comboBoxConcentration.Text;
         }
 
-        public void SetTableList(List<DataGridView> dataGridViews, List<String> tablenames = null)
+        public void SetTableList(List<DataGridView> dataGridViews)
         {
             _tableList = dataGridViews;
-            _tablenames = tablenames;
             DataGridView firstDataGridView = dataGridViews.First();
             dataGridViewInputData = firstDataGridView;
             dataGridViewInputData.Location = _location;
             dataGridViewInputData.Size = _size;
             dataGridViewInputData.Anchor = _anchor;
+            UpdateTableSelection();
         }
 
         public void SetTableNames(List<String> tableNames)
         {
-            _tablenames = tableNames;
-            UpdateTableSelection();
+            foreach (string tableName in tableNames)
+            {
+                string cleaned_name = tableName.Replace(_entryName.Replace(" ","_"),String.Empty);
+                cleaned_name = cleaned_name.Replace("_", " ");
+                cleaned_name = cleaned_name.Trim();
+                MessageBox.Show("EntryName: " + _entryName +"\nBefore Cleaning: " + tableName + "\nAfter Cleaning: " + cleaned_name);
+                _tablenames.Add(cleaned_name);
+            }
+            if (_tableList != null)
+            {
+                UpdateTableSelection();
+            }
+            
+        }
+
+        public void AddCurrentDataGridViewToTables()
+        {
+            _tableList.Add(dataGridViewInputData);
+            if (_tablenames != null)
+            {
+                UpdateTableSelection();
+            }
         }
 
 

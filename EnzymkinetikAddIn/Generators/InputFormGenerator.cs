@@ -11,13 +11,13 @@ using EnzymkinetikAddIn.Utilities;
 
 namespace EnzymkinetikAddIn.Generators
 {
-    internal class InputFormGenerator : IFormGenerator
+    internal class InputFormGenerator
     {
-        public BaseForm GenerateForm(string concentration, string unit)
+        public BaseForm GenerateForm(string concentration, string unit, List<string> tablenames)
         {
             // Erstellt ein neues Formular
             BaseForm form = new BaseForm();
-
+            form.SetTableNames(tablenames);
             // Zugriff auf das DataGridView des Formulars
             var dataGridView = form.GetDataGridView();
             ConfigureColumns(dataGridView, concentration, unit);

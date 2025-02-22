@@ -16,10 +16,10 @@ namespace EnzymkinetikAddIn.Factories
     public class FormFactory
     {
 
-        public BaseForm CreateForm(string concentration, string unit)
+        public BaseForm CreateForm(string concentration, string unit, List<string> tablenames)
         {
             InputFormGenerator _dataSetGenerator = new InputFormGenerator();
-            return _dataSetGenerator.GenerateForm(concentration, unit);
+            return _dataSetGenerator.GenerateForm(concentration, unit, tablenames);
         }
 
         public BaseForm CreateEditForm(string entryName, List<DataTable> tables)

@@ -50,38 +50,54 @@ namespace EnzymkinetikAddIn.Data
         private static void CreateDatabase(string dbPath) => SQLiteConnection.CreateFile(dbPath);
 
 
-        public static bool SaveDataGridViewToDatabase(DataGridView dgv, string entryName, string tableSuffix, bool editMode = false)
+        public static bool SaveDataGridViewToDatabase(SQLiteConnection conn, DataGridView dgv, string entryName, string tableSuffix)
         {
-            if (dgv == null || dgv.Rows.Count == 0)
+            if (dgv == null || dgv.Rows.Cast<DataGridViewRow>().All(row => row.IsNewRow || row.Cells.Cast<DataGridViewCell>().All(cell => string.IsNullOrEmpty(cell.Value?.ToString()))))
                 return false;
 
-            using (var conn = GetConnection())
+            string tableName = $"{entryName}_{tableSuffix}".Replace(" ", "_");
+
+            // Holen des entryId anhand des entryName
+            int entryId = GetOrCreateEntryId(conn, entryName);
+
+            using (var transaction = conn.BeginTransaction())
             {
-                conn.Open();
-                int entryId = GetOrCreateEntryId(conn, entryName);
-                string tableName = $"{entryName}_{tableSuffix}".Replace(" ", "_");
-
-                using (var transaction = conn.BeginTransaction())
+                try
                 {
-                    try
-                    {
-                        CreateTable(conn, dgv, tableName, entryId);
-                        InsertRows(conn, dgv, tableName, entryId);
-
-                        SaveTableName(conn, entryId, tableName); // Tabellennamen speichern
-
-                        transaction.Commit();
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        MessageBox.Show($"Fehler: {ex.Message}", "Datenbankfehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return false;
-                    }
+                    CreateTable(conn, dgv, tableName, entryId); // entryId anstelle von entryName übergeben
+                    InsertRows(conn, dgv, tableName, entryId);  // entryId anstelle von entryName übergeben
+                    SaveTableName(conn, entryId, tableName);    // entryId anstelle von entryName übergeben
+                    transaction.Commit();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    MessageBox.Show($"Fehler: {ex.Message}", "Datenbankfehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
                 }
             }
         }
+
+
+
+        public static void DeleteTableFromDatabase(SQLiteConnection conn, string entryName, string tableSuffix)
+        {
+            string tableName = $"{entryName}_{tableSuffix}".Replace(" ", "_");
+
+            using (var cmd = new SQLiteCommand($"DROP TABLE IF EXISTS [{tableName}]", conn))
+            {
+                cmd.ExecuteNonQuery();
+            }
+
+            // Entferne den Tabellennamen aus EntryTables
+            using (var cmd = new SQLiteCommand($"DELETE FROM EntryTables WHERE TableName = @tableName", conn))
+            {
+                cmd.Parameters.AddWithValue("@tableName", tableName);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
 
 
 
@@ -90,26 +106,54 @@ namespace EnzymkinetikAddIn.Data
         // Tabelle mit den Spalten aus DataGridView erstellen
         private static void CreateTable(SQLiteConnection conn, DataGridView dgv, string tableName, int entryId)
         {
+            // Prüfen, ob die Tabelle existiert und gegebenenfalls löschen
+            string checkIfTableExistsQuery = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}'";
+            using (var cmd = new SQLiteCommand(checkIfTableExistsQuery, conn))
+            {
+                var result = cmd.ExecuteScalar();
+                if (result != null)
+                {
+                    // Tabelle löschen, wenn sie existiert (optional, je nach Anforderung)
+                    string dropTableQuery = $"DROP TABLE IF EXISTS {tableName}";
+                    using (var dropCmd = new SQLiteCommand(dropTableQuery, conn))
+                    {
+                        dropCmd.ExecuteNonQuery();
+                    }
+                }
+            }
+
+            // Spaltendefinitionen aus DataGridView generieren
             var columnDefinitions = string.Join(", ", dgv.Columns.Cast<DataGridViewColumn>()
                 .Select(c => $"[{SanitizeColumnName(c.HeaderText)}] {GetSqlType(c.ValueType)}"));
 
+            // SQL-Query zum Erstellen der Tabelle
             string createTableQuery = $@"
-        CREATE TABLE {tableName} (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            EntryID INTEGER NOT NULL,
-            {columnDefinitions},
-            FOREIGN KEY (EntryID) REFERENCES Entries(ID) ON DELETE CASCADE
-        );";
+    CREATE TABLE {tableName} (
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
+        EntryID INTEGER NOT NULL,
+        {columnDefinitions},
+        FOREIGN KEY (EntryID) REFERENCES Entries(ID) ON DELETE CASCADE
+    );";
+
             using (var cmd = new SQLiteCommand(createTableQuery, conn))
             {
-                cmd.ExecuteNonQuery();
+                cmd.ExecuteNonQuery(); // Tabelle erstellen
             }
         }
+
 
 
         // Zeilen in die Tabelle einfügen
         private static void InsertRows(SQLiteConnection conn, DataGridView dgv, string tableName, int entryId)
         {
+            // Optional: Vorherige Daten löschen, falls gewünscht
+            string deleteQuery = $"DELETE FROM {tableName} WHERE EntryID = @entryId";
+            using (var deleteCmd = new SQLiteCommand(deleteQuery, conn))
+            {
+                deleteCmd.Parameters.AddWithValue("@entryId", entryId);
+                deleteCmd.ExecuteNonQuery(); // Löschen der bestehenden Daten für diesen EntryID
+            }
+
             foreach (DataGridViewRow row in dgv.Rows)
             {
                 if (row.IsNewRow) continue;
@@ -139,6 +183,7 @@ namespace EnzymkinetikAddIn.Data
                 }
             }
         }
+
 
 
 
@@ -278,7 +323,7 @@ namespace EnzymkinetikAddIn.Data
                         adapter.Fill(dt);
                         dt.TableName = tableName; // Speichert den Tabellennamen im DataTable
                     }
-
+                    MessageBox.Show($"Tabelle {tableName} hat {dt.Rows.Count} Zeilen.");
                     dataTables.Add(dt);
                 }
             }
@@ -330,56 +375,6 @@ namespace EnzymkinetikAddIn.Data
             }
 
             return tableNames;
-        }
-
-
-
-        // Tabelle umbenennen
-        public static void RenameTable(string oldName, string newName)
-        {
-            using (var connection = GetConnection())
-            {
-                connection.Open();
-                newName = GetUniqueTableName(connection, newName);
-
-                string query = $"ALTER TABLE {oldName} RENAME TO {newName};";
-                var command = new SQLiteCommand(query, connection);
-                command.ExecuteNonQuery();
-            }
-        }
-
-        // TODO: Für neue Integration der Datenbank anpassen
-        public static bool UpdateTableFromDataGridView(DataGridView dataGridView, string entryName, string tableSuffix)
-        {
-            string tableName = $"{entryName}_{tableSuffix}".Replace(" ", "_");
-            MessageBox.Show("old: " + entryName + "\nnew: " + tableName);
-
-            try
-            {
-                DeleteTable(tableName);
-                SaveDataGridViewToDatabase(dataGridView, entryName, tableSuffix);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Fehler beim Aktualisieren: {ex.Message}", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-        }
-
-
-        // Tabelle löschen
-        public static void DeleteTable(string tableName)
-        {
-            using (var connection = GetConnection())
-            {
-                connection.Open();
-                string query = $"DROP TABLE IF EXISTS [{tableName}];";
-                using (var command = new SQLiteCommand(query, connection))
-                {
-                    command.ExecuteNonQuery();
-                }
-            }
         }
 
         private static void EnsureEntriesTableExists(SQLiteConnection conn)
@@ -546,17 +541,59 @@ namespace EnzymkinetikAddIn.Data
 
         private static void SaveTableName(SQLiteConnection conn, int entryId, string tableName)
         {
-            string insertQuery = "INSERT INTO EntryTables (EntryID, TableName) VALUES (@entryId, @tableName);";
-
-            using (var cmd = new SQLiteCommand(insertQuery, conn))
+            // Einfügen des Tabellennamens, falls er noch nicht existiert
+            string checkIfTableNameExistsQuery = "SELECT COUNT(*) FROM EntryTables WHERE EntryID = @entryId AND TableName = @tableName";
+            using (var cmd = new SQLiteCommand(checkIfTableNameExistsQuery, conn))
             {
                 cmd.Parameters.AddWithValue("@entryId", entryId);
                 cmd.Parameters.AddWithValue("@tableName", tableName);
-                cmd.ExecuteNonQuery();
+
+                int count = Convert.ToInt32(cmd.ExecuteScalar());
+                if (count == 0)
+                {
+                    // Wenn der Tabelleneintrag noch nicht existiert, hinzufügen
+                    string insertQuery = "INSERT INTO EntryTables (EntryID, TableName) VALUES (@entryId, @tableName);";
+                    using (var insertCmd = new SQLiteCommand(insertQuery, conn))
+                    {
+                        insertCmd.Parameters.AddWithValue("@entryId", entryId);
+                        insertCmd.Parameters.AddWithValue("@tableName", tableName);
+                        insertCmd.ExecuteNonQuery();
+                    }
+                }
             }
         }
 
 
+        public static bool SaveAllTablesToDatabase(string entryName, List<DataGridView> tableList, List<string> tableNames)
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+
+                // Entferne Tabellen, die nicht mehr in tableList sind
+                foreach (string tableName in tableNames)
+                {
+                    if (!tableList.Any(t => t.Name == tableName)) // Wenn die Tabelle nicht mehr in tableList enthalten ist
+                    {
+                        // Tabelle aus der Datenbank entfernen
+                        DeleteTableFromDatabase(conn, entryName, tableName);
+                    }
+                }
+
+                // Speichere alle Tabellen, die in tableList sind
+                foreach (var (table, index) in tableList.Select((t, i) => (t, i)))
+                {
+                    string tableName = tableNames[index];
+                    // Speichern der DataGridView in die Datenbank
+                    if (!SaveDataGridViewToDatabase(conn, table, entryName, tableName))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
 
     }
 }

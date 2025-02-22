@@ -118,7 +118,7 @@ namespace EnzymkinetikAddIn.Ribbon
                 string entryName = form.EntryName;
                 string tableName = form.TableName;
 
-                if (string.IsNullOrWhiteSpace(entryName))
+                if (string.IsNullOrWhiteSpace(entryName) || string.IsNullOrWhiteSpace(tableName))
                 {
                     MessageBox.Show("Kein Name eingegeben. Abbruch.", "Abbruch", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -126,10 +126,9 @@ namespace EnzymkinetikAddIn.Ribbon
                 string concentration = dropDownConcentrations.SelectedItem.Label;
                 string unit = dropDownUnit.SelectedItem.Label;
 
-                var inputForm = _formFactory.CreateForm(concentration, unit);
-                List<string> tablenames = new List<string>() { tableName };
-                inputForm.SetTableNames(tablenames);
+                var inputForm = _formFactory.CreateForm(concentration, unit, new List<string>() { tableName });
                 inputForm.SetEntryName(entryName);
+                inputForm.AddCurrentDataGridViewToTables();
                 inputForm.SetRibbonReference(this);
                 inputForm.ShowDialog();
 
@@ -145,9 +144,9 @@ namespace EnzymkinetikAddIn.Ribbon
 
             string selectedEntry = dropDownDataSet.SelectedItem.Label; // Hauptname holen
             List<DataTable> tables = DatabaseHelper.LoadTablesForEntry(selectedEntry);
-            MessageBox.Show("tables in buttoneditdata_click:" + tables.Count());
             FormFactory factory = new FormFactory();
             BaseForm editForm = factory.CreateEditForm(selectedEntry, tables);
+            editForm.SetRibbonReference(this);
             editForm.Show();
         }
 
