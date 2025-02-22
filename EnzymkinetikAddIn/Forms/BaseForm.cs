@@ -337,8 +337,8 @@ namespace EnzymkinetikAddIn.Forms
 
             // Der Liste hinzufügen
             _tableList.Add(dataGridViewInputData);
-            _tablenames.Add(nameTextBox.Text);
-
+            string name = checkForDuplicates();
+            _tablenames.Add(name);
             // In das UI einfügen
             Controls.Add(dataGridViewInputData);
             dataGridViewInputData.BringToFront();
@@ -346,6 +346,23 @@ namespace EnzymkinetikAddIn.Forms
             // ComboBox refreshen
             UpdateTableSelection();
             deleteButton.Enabled = true;
+        }
+
+        private string checkForDuplicates()
+        {
+            string input = nameTextBox.Text;
+            string unique_string = input;
+            int counter = 1;
+
+            // Überprüfe, ob der input bereits in der Liste von Tabellennamen enthalten ist
+            while (_tablenames.Contains(unique_string))
+            {
+                // Füge eine Zahl hinzu, um den Wert einzigartig zu machen
+                unique_string = input + "_"+ counter.ToString();
+                counter++;
+            }
+
+            return unique_string;
         }
 
 
