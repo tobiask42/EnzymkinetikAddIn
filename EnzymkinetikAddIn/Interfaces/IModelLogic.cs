@@ -10,6 +10,6 @@ namespace EnzymkinetikAddIn.Interfaces
 {
     internal interface IModelLogic
     {
-        List<List<DataTable>> CalculateResult(string tableName);
+        Dictionary<string, DataTable> CalculateResult(string tableName);
     }
 }
