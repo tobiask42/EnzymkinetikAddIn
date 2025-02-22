@@ -52,7 +52,7 @@ namespace EnzymkinetikAddIn.Data
 
         public static bool SaveDataGridViewToDatabase(SQLiteConnection conn, DataGridView dgv, string entryName, string tableSuffix)
         {
-            if (dgv == null || dgv.Rows.Cast<DataGridViewRow>().All(row => row.IsNewRow || row.Cells.Cast<DataGridViewCell>().All(cell => string.IsNullOrEmpty(cell.Value?.ToString()))))
+            if (dgv == null)
                 return false;
 
             string tableName = $"{entryName}_{tableSuffix}".Replace(" ", "_");
