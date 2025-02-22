@@ -547,18 +547,23 @@ namespace EnzymkinetikAddIn.Data
             using (var conn = GetConnection())
             {
                 conn.Open();
-
-                // Entferne Tabellen, die nicht mehr in tableList sind
+                List<string> currentTableNames = GetTablesForEntry(entryName);
+                List<string> newTableNames = new List<string>();
                 foreach (string tableName in tableNames)
                 {
-                    string fullName = entryName + "_" + tableName;
-                    MessageBox.Show("EntryName: " + entryName + "\nTableName: " + tableName + "\nFullName: " + fullName);
-                    MessageBox.Show("TableNames: " + tableNames.ToString());
-                    if (!tableList.Any(t => t.Name == fullName)) // Wenn die Tabelle nicht mehr in tableList enthalten ist
-                    {
-                        // Tabelle aus der Datenbank entfernen
-                        DeleteTableFromDatabase(conn, entryName, tableName);
-                    }
+                    string name = tableName.Replace(" ", "_");
+                    name = entryName.Replace(" ", "_") + "_" + name;
+                    newTableNames.Add(name);
+                }
+                var toBeRemoved = currentTableNames.Except(newTableNames).ToList();
+                MessageBox.Show("EntryName: " + entryName +
+                    "\nCurrentTableNames: " + string.Join(", ", currentTableNames) +
+                    "\nNewTableNames: " + string.Join(", ", newTableNames) +
+                    "\nToBeRemoved: " + string.Join(", ", toBeRemoved));
+
+                foreach (string tableName in toBeRemoved)
+                {
+                    DeleteTableFromDatabase(conn, tableName);
                 }
 
                 // Speichere alle Tabellen, die in tableList sind
@@ -576,5 +581,14 @@ namespace EnzymkinetikAddIn.Data
             return true;
         }
 
+        private static void DeleteTableFromDatabase(SQLiteConnection conn, string tableName)
+        {
+            string dropQuery = "DROP TABLE " + tableName + "; DELETE FROM EntryTables WHERE TableName IS '" + tableName + "';";
+
+            using (var dropCmd = new SQLiteCommand(dropQuery, conn))
+            {
+                dropCmd.ExecuteNonQuery();
+            }
+        }
     }
 }
