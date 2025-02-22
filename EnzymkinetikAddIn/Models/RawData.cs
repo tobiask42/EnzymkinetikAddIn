@@ -12,14 +12,9 @@ namespace EnzymkinetikAddIn.Models
 {
     internal class RawData : IModelLogic
     {
-        public List<List<DataTable>> CalculateResult(string tableName)
+        public Dictionary<string, DataTable> CalculateResult(string entryName)
         {
-            DataTable rawData = DataTransformer.TransformFromDatabase(tableName);
-            //rawData = DatabaseHelper.LoadTable(tableName);
-            return new List<List<DataTable>>
-            {
-                new List<DataTable> { rawData }
-            };
+            return DataTransformer.TransformFromDatabase(entryName);
         }
     }
 }

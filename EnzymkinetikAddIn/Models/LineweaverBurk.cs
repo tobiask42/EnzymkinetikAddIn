@@ -10,7 +10,7 @@ namespace EnzymkinetikAddIn.Models
 {
     internal class LineweaverBurk : IModelLogic
     {
-        public List<List<DataTable>> CalculateResult(string tableName)
+        public Dictionary<string, DataTable> CalculateResult(string tableName)
         {
             throw new NotImplementedException();
         }
