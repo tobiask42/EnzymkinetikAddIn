@@ -556,10 +556,10 @@ namespace EnzymkinetikAddIn.Data
                     newTableNames.Add(name);
                 }
                 var toBeRemoved = currentTableNames.Except(newTableNames).ToList();
-                MessageBox.Show("EntryName: " + entryName +
-                    "\nCurrentTableNames: " + string.Join(", ", currentTableNames) +
-                    "\nNewTableNames: " + string.Join(", ", newTableNames) +
-                    "\nToBeRemoved: " + string.Join(", ", toBeRemoved));
+                //MessageBox.Show("EntryName: " + entryName +
+                //    "\nCurrentTableNames: " + string.Join(", ", currentTableNames) +
+                //    "\nNewTableNames: " + string.Join(", ", newTableNames) +
+                //    "\nToBeRemoved: " + string.Join(", ", toBeRemoved));
 
                 foreach (string tableName in toBeRemoved)
                 {
