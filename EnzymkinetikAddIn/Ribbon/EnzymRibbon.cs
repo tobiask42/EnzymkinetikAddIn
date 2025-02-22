@@ -168,13 +168,13 @@ namespace EnzymkinetikAddIn.Ribbon
 
         private void buttonGenerateResult_Click(object sender, RibbonControlEventArgs e)
         {
-            string tableName = dropDownDataSet.SelectedItem.Label;
+            string entryName = dropDownDataSet.SelectedItem.Label;
             string modelName = dropDownModel.SelectedItem.Label;
 
             try
             {
                 var model = _modelFactory.GenerateModel(modelName);
-                List<List<DataTable>> result = model.CalculateResult(tableName);
+                Dictionary<string, DataTable> result = model.CalculateResult(entryName);
 
                 ExcelExporter.ExportToExcel(result);
             }
