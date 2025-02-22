@@ -243,28 +243,6 @@ namespace EnzymkinetikAddIn.Data
             return tableNames;
         }
 
-        // Tabelle mit einzigartigem Namen finden
-        private static string GetUniqueTableName(SQLiteConnection conn, string baseName)
-        {
-            int counter = 1;
-            string tableName = baseName;
-
-            using (var cmd = new SQLiteCommand("SELECT name FROM sqlite_master WHERE type='table' AND name = @name", conn))
-            {
-                cmd.Parameters.AddWithValue("@name", tableName);
-
-                while (cmd.ExecuteScalar() != null)
-                {
-                    tableName = $"{baseName}_{counter}";
-                    cmd.Parameters["@name"].Value = tableName;
-                    counter++;
-                }
-            }
-
-            return tableName;
-        }
-
-
         // Tabelle laden und zurückgeben
         public static List<DataTable> LoadTablesForEntry(string entryName)
         {
@@ -323,11 +301,11 @@ namespace EnzymkinetikAddIn.Data
                         adapter.Fill(dt);
                         dt.TableName = tableName; // Speichert den Tabellennamen im DataTable
                     }
-                    MessageBox.Show($"Tabelle {tableName} hat {dt.Rows.Count} Zeilen.");
+                    //MessageBox.Show($"Tabelle {tableName} hat {dt.Rows.Count} Zeilen.");
                     dataTables.Add(dt);
                 }
             }
-            MessageBox.Show("Tabellen in Datatables: " + dataTables.Count());
+            //MessageBox.Show("Tabellen in Datatables: " + dataTables.Count());
             return dataTables;
         }
 
@@ -573,7 +551,10 @@ namespace EnzymkinetikAddIn.Data
                 // Entferne Tabellen, die nicht mehr in tableList sind
                 foreach (string tableName in tableNames)
                 {
-                    if (!tableList.Any(t => t.Name == tableName)) // Wenn die Tabelle nicht mehr in tableList enthalten ist
+                    string fullName = entryName + "_" + tableName;
+                    MessageBox.Show("EntryName: " + entryName + "\nTableName: " + tableName + "\nFullName: " + fullName);
+                    MessageBox.Show("TableNames: " + tableNames.ToString());
+                    if (!tableList.Any(t => t.Name == fullName)) // Wenn die Tabelle nicht mehr in tableList enthalten ist
                     {
                         // Tabelle aus der Datenbank entfernen
                         DeleteTableFromDatabase(conn, entryName, tableName);
