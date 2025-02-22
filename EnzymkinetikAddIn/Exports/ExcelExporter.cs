@@ -9,29 +9,12 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace EnzymkinetikAddIn.Exports
 {
+
     internal class ExcelExporter
     {
-
-        public static void ExportToExcel(List<List<DataTable>> tables)
+        public static void ExportToExcel(Dictionary<string, DataTable> tableDictionary)
         {
-            DataTable[,] arrayTables = new DataTable[tables.Count, tables[0].Count];
-
-            for (int i = 0; i < tables.Count; i++)
-            {
-                for (int j = 0; j < tables[i].Count; j++)
-                {
-                    arrayTables[i, j] = tables[i][j];
-                }
-            }
-
-            ExportToExcel(arrayTables);
-        }
-
-        public static void ExportToExcel(DataTable[,] tables)
-        {
-            if (tables == null || tables.Length == 0)
-                throw new ArgumentException("Keine Tabellen zum Exportieren vorhanden!");
-
+            // Excel-Applikation starten
             Excel.Application excelApp = null;
             Excel.Worksheet worksheet = null;
 
@@ -50,24 +33,39 @@ namespace EnzymkinetikAddIn.Exports
                 int currentRow = startRow;
                 int currentCol = startCol;
 
-                // Iteriere durch alle Tabellen (z.B. Tabellen in Spalten anordnen)
-                for (int i = 0; i < tables.GetLength(0); i++)
+                // Iteriere durch alle Tabellen im Dictionary
+                foreach (var kvp in tableDictionary)
                 {
-                    for (int j = 0; j < tables.GetLength(1); j++)
+                    string tableName = kvp.Key;
+                    DataTable table = kvp.Value;
+
+                    if (table == null) continue;
+
+                    // Schreibe den Tabellennamen als Überschrift
+                    worksheet.Cells[currentRow, currentCol] = tableName;
+                    worksheet.Cells[currentRow, currentCol].Font.Bold = true;  // Fett formatieren
+                    currentRow++;  // Gehe zur nächsten Zeile
+
+                    // Schreibe die Spaltenüberschriften
+                    for (int i = 0; i < table.Columns.Count; i++)
                     {
-                        DataTable table = tables[i, j];
-                        if (table == null) continue;
-
-                        // Tabelle in Excel schreiben
-                        WriteTableToExcel(worksheet, table, currentRow, currentCol);
-
-                        // Nach rechts verschieben für die nächste Tabelle
-                        currentCol += table.Columns.Count + 2; // 2 Spalten als Abstand
+                        worksheet.Cells[currentRow, currentCol + i] = table.Columns[i].ColumnName;
+                        worksheet.Cells[currentRow, currentCol + i].Font.Bold = true;
                     }
 
-                    // Nach unten verschieben für die nächste Tabellenreihe
-                    currentCol = startCol;
-                    currentRow += tables[0, 0].Rows.Count + 3; // 3 Zeilen Abstand
+                    currentRow++;  // Gehe zur nächsten Zeile für die Daten
+
+                    // Schreibe die Datenzeilen
+                    for (int i = 0; i < table.Rows.Count; i++)
+                    {
+                        for (int j = 0; j < table.Columns.Count; j++)
+                        {
+                            object value = table.Rows[i][j];
+                            worksheet.Cells[currentRow + i, currentCol + j] = value == DBNull.Value ? "" : value;
+                        }
+                    }
+
+                    currentRow += table.Rows.Count + 3;  // Nach unten verschieben für die nächste Tabelle
                 }
             }
             catch (Exception ex)
@@ -79,26 +77,6 @@ namespace EnzymkinetikAddIn.Exports
                 // Excel Speicherbereinigung
                 if (worksheet != null) System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
                 if (excelApp != null) System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
-            }
-        }
-
-        private static void WriteTableToExcel(Excel.Worksheet sheet, DataTable table, int row, int col)
-        {
-            // Spaltenüberschriften
-            for (int i = 0; i < table.Columns.Count; i++)
-            {
-                sheet.Cells[row, col + i] = table.Columns[i].ColumnName;
-                sheet.Cells[row, col + i].Font.Bold = true; // Fettdruck für Header
-            }
-
-            // Datenzeilen
-            for (int i = 0; i < table.Rows.Count; i++)
-            {
-                for (int j = 0; j < table.Columns.Count; j++)
-                {
-                    object value = table.Rows[i][j];
-                    sheet.Cells[row + i + 1, col + j] = value == DBNull.Value ? "" : value;
-                }
             }
         }
     }
