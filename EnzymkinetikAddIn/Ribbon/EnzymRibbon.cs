@@ -125,9 +125,10 @@ namespace EnzymkinetikAddIn.Ribbon
                 }
                 string concentration = dropDownConcentrations.SelectedItem.Label;
                 string unit = dropDownUnit.SelectedItem.Label;
-
-                var inputForm = _formFactory.CreateForm(concentration, unit, new List<string>() { tableName });
+                entryName = checkForDuplicates(entryName);
+                var inputForm = _formFactory.CreateForm(concentration, unit);
                 inputForm.SetEntryName(entryName);
+                inputForm.SetTableNames(new List<string>() { tableName });
                 inputForm.AddCurrentDataGridViewToTables();
                 inputForm.SetRibbonReference(this);
                 inputForm.ShowDialog();
@@ -136,7 +137,21 @@ namespace EnzymkinetikAddIn.Ribbon
 
 
         }
+        private string checkForDuplicates(string input)
+        {
+            string unique_string = input;
+            int counter = 1;
 
+            // Überprüfe, ob der input bereits in den Items des dropDownDataSet enthalten ist
+            while (dropDownDataSet.Items.Cast<RibbonDropDownItem>().Any(item => item.Label == unique_string))
+            {
+                // Füge eine Zahl hinzu, um den Wert einzigartig zu machen
+                unique_string = input + "_" + counter.ToString();
+                counter++;
+            }
+            MessageBox.Show(unique_string);
+            return unique_string;
+        }
 
         private void buttonEditData_Click(object sender, RibbonControlEventArgs e)
         {
