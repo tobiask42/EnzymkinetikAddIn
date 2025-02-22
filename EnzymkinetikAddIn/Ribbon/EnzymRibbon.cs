@@ -149,7 +149,6 @@ namespace EnzymkinetikAddIn.Ribbon
                 unique_string = input + "_" + counter.ToString();
                 counter++;
             }
-            MessageBox.Show(unique_string);
             return unique_string;
         }
 

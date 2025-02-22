@@ -76,7 +76,7 @@ namespace EnzymkinetikAddIn.Forms
 
         private void DeleteTable()
         {
-            MessageBox.Show(comboBoxTableName.Text);
+            MessageBox.Show(comboBoxTableName.Text + " gelöscht");
             selectedTableName = comboBoxTableName.Text;
             int index = comboBoxTableName.SelectedIndex;
             if (_tableList.Count > 1)
@@ -371,15 +371,15 @@ namespace EnzymkinetikAddIn.Forms
         // Aktualisiert die ComboBox für den Tabellenauswahl
         private void UpdateTableSelection()
         {
-            if (_tablenames == null)
-            {
-                MessageBox.Show("tablenames is null");
-                return;
-            } else if (_tablenames.Count() == 0)
-            {
-                MessageBox.Show("tablenames is empty");
-            }
-            MessageBox.Show("tablenames size: " + _tablenames.Count());
+            //if (_tablenames == null)
+            //{
+            //    MessageBox.Show("tablenames is null");
+            //    return;
+            //} else if (_tablenames.Count() == 0)
+            //{
+            //    MessageBox.Show("tablenames is empty");
+            //}
+            //MessageBox.Show("tablenames size: " + _tablenames.Count());
             comboBoxTableName.Items.Clear();
             for (int i = 0; i < _tableList.Count; i++)
             {
@@ -482,7 +482,7 @@ namespace EnzymkinetikAddIn.Forms
 
         internal void SetEntryName(string entryName)
         {
-            MessageBox.Show("Setting entryName:" + entryName);
+            //MessageBox.Show("Setting entryName:" + entryName);
             _entryName = entryName;
         }
 
@@ -509,7 +509,7 @@ namespace EnzymkinetikAddIn.Forms
                 string cleaned_name = tableName.Replace(_entryName.Replace(" ","_"),String.Empty);
                 cleaned_name = cleaned_name.Replace("_", " ");
                 cleaned_name = cleaned_name.Trim();
-                MessageBox.Show("EntryName: " + _entryName +"\nBefore Cleaning: " + tableName + "\nAfter Cleaning: " + cleaned_name);
+                //MessageBox.Show("EntryName: " + _entryName +"\nBefore Cleaning: " + tableName + "\nAfter Cleaning: " + cleaned_name);
                 _tablenames.Add(cleaned_name);
             }
             if (_tableList != null)
