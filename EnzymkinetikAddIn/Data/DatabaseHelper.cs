@@ -250,7 +250,6 @@ namespace EnzymkinetikAddIn.Data
                         }
                     }
                 }
-
                 // Lade die Inhalte jeder Tabelle in ein DataTable
                 foreach (string tableName in tableNames)
                 {
@@ -283,12 +282,55 @@ namespace EnzymkinetikAddIn.Data
                     dataTables.Add(dt);
                 }
             }
-
+            MessageBox.Show("Tabellen in Datatables: " + dataTables.Count());
             return dataTables;
         }
 
 
+        public static List<string> GetTableNamesByEntryName(string entryName)
+        {
+            List<string> tableNames = new List<string>();
 
+            using (var connection = new SQLiteConnection(_connectionString))
+            {
+                connection.Open();
+
+                // Hole die ID des Eintrags anhand des Namens
+                string getIdQuery = "SELECT ID FROM Entries WHERE Name = @entryName;";
+                using (var command = new SQLiteCommand(getIdQuery, connection))
+                {
+                    command.Parameters.AddWithValue("@entryName", entryName);
+
+                    object result = command.ExecuteScalar();
+                    if (result == null)
+                    {
+                        Console.WriteLine($"Eintrag mit Name '{entryName}' nicht gefunden.");
+                        return tableNames; // Leere Liste zurückgeben
+                    }
+
+                    int entryID = Convert.ToInt32(result);
+
+                    // Hole alle Tabellennamen aus EntryTables, die zu dieser ID gehören
+                    string getTablesQuery = "SELECT TableName FROM EntryTables WHERE EntryID = @entryID;";
+                    using (var getTablesCommand = new SQLiteCommand(getTablesQuery, connection))
+                    {
+                        getTablesCommand.Parameters.AddWithValue("@entryID", entryID);
+
+                        using (var reader = getTablesCommand.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                tableNames.Add(reader.GetString(0)); // TableName auslesen und hinzufügen
+                            }
+                        }
+                    }
+                }
+
+                connection.Close();
+            }
+
+            return tableNames;
+        }
 
 
 
@@ -345,9 +387,8 @@ namespace EnzymkinetikAddIn.Data
             string createEntriesTableQuery = @"
             CREATE TABLE IF NOT EXISTS Entries (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                Name TEXT UNIQUE NOT NULL
+                Name TEXT NOT NULL UNIQUE
             );";
-
             using (var cmd = new SQLiteCommand(createEntriesTableQuery, conn))
             {
                 cmd.ExecuteNonQuery();
@@ -361,11 +402,66 @@ namespace EnzymkinetikAddIn.Data
                 FOREIGN KEY (EntryID) REFERENCES Entries(ID) ON DELETE CASCADE
             );";
 
+
             using (var cmd = new SQLiteCommand(createEntryTablesQuery, conn))
             {
                 cmd.ExecuteNonQuery();
             }
         }
+
+        public static void DeleteEntryWithTablesByName(string entryName)
+        {
+            using (var connection = new SQLiteConnection(_connectionString))
+            {
+                connection.Open();
+
+                // Hole die ID des Eintrags basierend auf dem Namen
+                string getIdQuery = "SELECT ID FROM Entries WHERE Name = @entryName;";
+                var command = new SQLiteCommand(getIdQuery, connection);
+                command.Parameters.AddWithValue("@entryName", entryName);
+
+                object result = command.ExecuteScalar();
+                if (result == null)
+                {
+                    Console.WriteLine($"Eintrag mit Name '{entryName}' nicht gefunden.");
+                    return;
+                }
+
+                int entryID = Convert.ToInt32(result);
+
+                // Hole die Tabellennamen aus EntryTables
+                string getTablesQuery = "SELECT TableName FROM EntryTables WHERE EntryID = @entryID;";
+                command = new SQLiteCommand(getTablesQuery, connection);
+                command.Parameters.AddWithValue("@entryID", entryID);
+
+                List<string> tableNames = new List<string>();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        tableNames.Add(reader.GetString(0));
+                    }
+                }
+
+                // Lösche den Eintrag aus Entries (CASCADE löscht automatisch die Einträge in EntryTables)
+                string deleteEntryQuery = "DELETE FROM Entries WHERE ID = @entryID;";
+                command = new SQLiteCommand(deleteEntryQuery, connection);
+                command.Parameters.AddWithValue("@entryID", entryID);
+                command.ExecuteNonQuery();
+
+                // Lösche alle Tabellen, die im Feld TableName standen
+                foreach (string tableName in tableNames)
+                {
+                    string dropTableQuery = $"DROP TABLE IF EXISTS {tableName};";
+                    command = new SQLiteCommand(dropTableQuery, connection);
+                    command.ExecuteNonQuery();
+                    Console.WriteLine($"Tabelle '{tableName}' gelöscht.");
+                }
+
+                connection.Close();
+            }
+        }
+
 
 
         private static int GetOrCreateEntryId(SQLiteConnection conn, string entryName)

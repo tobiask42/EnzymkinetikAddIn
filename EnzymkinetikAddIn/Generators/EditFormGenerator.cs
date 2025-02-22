@@ -22,8 +22,12 @@ namespace EnzymkinetikAddIn.Generators
             form.Name = entryName;
             DataGridView baseDataGridView = form.GetDataGridView();
             form.setEditMode(true);
+            MessageBox.Show("tables in GenerateForm: " + tables.Count());
             List<DataGridView> dataGridViews = dataGridManager.GetDataGridViews(tables);
+            MessageBox.Show("datagridviews in generateform: " + dataGridViews.Count());
             form.SetTableList(dataGridViews);
+            List<string> tablenames = DatabaseHelper.GetTableNamesByEntryName(entryName);
+            form.SetTableNames(tablenames);
             return form;
         }
     }

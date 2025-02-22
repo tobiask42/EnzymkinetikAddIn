@@ -66,7 +66,11 @@ namespace EnzymkinetikAddIn.Forms
         private void DeleteDataset()
         {
             MessageBox.Show("Datensatz " + _entryName + " löschen");
-            // TODO: mit DatabaseHelper verbinden
+            if (editMode)
+            {
+                DatabaseHelper.DeleteEntryWithTablesByName(_entryName);
+            }            
+            this.Close();
         }
 
         private void DeleteTable()
@@ -350,9 +354,10 @@ namespace EnzymkinetikAddIn.Forms
         private void UpdateTableSelection()
         {
             comboBoxTableName.Items.Clear();
-
+            MessageBox.Show("tablenames: " + _tablenames.Count() + " tablelist: " + _tableList.Count);
             for (int i = 0; i < _tableList.Count; i++)
             {
+                MessageBox.Show("Tablename[0] =" + _tablenames[0]);
                 comboBoxTableName.Items.Add(_tablenames[i]);
             }
 
@@ -464,14 +469,11 @@ namespace EnzymkinetikAddIn.Forms
             dataGridViewInputData.Location = _location;
             dataGridViewInputData.Size = _size;
             dataGridViewInputData.Anchor = _anchor;
-
-            UpdateTableSelection();
         }
 
         public void SetTableNames(List<String> tableNames)
         {
             _tablenames = tableNames;
-            _tableList.Add(dataGridViewInputData);
             UpdateTableSelection();
         }
 

@@ -145,6 +145,7 @@ namespace EnzymkinetikAddIn.Ribbon
 
             string selectedEntry = dropDownDataSet.SelectedItem.Label; // Hauptname holen
             List<DataTable> tables = DatabaseHelper.LoadTablesForEntry(selectedEntry);
+            MessageBox.Show("tables in buttoneditdata_click:" + tables.Count());
             FormFactory factory = new FormFactory();
             BaseForm editForm = factory.CreateEditForm(selectedEntry, tables);
             editForm.Show();
