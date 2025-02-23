@@ -35,7 +35,13 @@ namespace EnzymkinetikAddIn.Ribbon
             string databaseName = "enzymkinetik.db";
             DatabaseHelper.InitializeDatabaseConnection(debug, databaseName);
             LoadDataEntries();
-            
+            DisableOptions();
+        }
+        // Deaktivieren der Dropdowns zur Auswahl der Einheit und Zeit (später eventuell wieder implementieren)
+        private void DisableOptions()
+        {
+            dropDownUnit.Enabled = false;
+           
         }
 
         private void createRibbonDropDown()

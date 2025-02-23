@@ -51,6 +51,14 @@ namespace EnzymkinetikAddIn.Forms
             _selectedConcentration = comboBoxConcentration.Text;
             _selectedUnit = comboBoxUnit.Text;
             InitializeDeleteContextMenu();
+            RemoveOptions();
+        }
+
+        // Deaktivieren der Dropdowns zur Auswahl der Einheit und Zeit (später eventuell wieder implementieren)
+        private void RemoveOptions()
+        {
+            comboBoxTimeUnit.Enabled = false;
+            comboBoxUnit.Enabled = false;
 
         }
 
