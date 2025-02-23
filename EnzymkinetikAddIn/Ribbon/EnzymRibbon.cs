@@ -180,7 +180,6 @@ namespace EnzymkinetikAddIn.Ribbon
             {
                 var model = _modelFactory.GenerateModel(modelName);
                 Dictionary<string, DataTable> result = model.CalculateResult(entryName);
-
                 ExcelExporter.ExportToExcel(result);
             }
             catch (Exception ex)
