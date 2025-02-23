@@ -73,24 +73,38 @@ namespace EnzymkinetikAddIn.Forms
 
         private void DeleteDataset()
         {
-            MessageBox.Show("Datensatz " + _entryName + " löschen");
+            DialogResult result = MessageBox.Show("Möchten Sie den Datensatz " + _entryName + " wirklich löschen?", "Datensatz löschen", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result != DialogResult.Yes)
+            {
+                return;
+            }
             if (editMode)
             {
                 DatabaseHelper.DeleteEntryWithTablesByName(_entryName);
                 _ribbon.LoadDataEntries();
-            }            
+            }
+            MessageBox.Show("Der Datensatz wurde erfolgreich gelöscht.", "Erfolg", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Close();
         }
 
         private void DeleteTable()
         {
-            MessageBox.Show(comboBoxTableName.Text + " gelöscht");
+            DialogResult result = MessageBox.Show("Möchten Sie die Tabelle " + comboBoxTableName.Text + " wirklich löschen?",
+                                                  "Tabelle löschen",
+                                                  MessageBoxButtons.YesNo,
+                                                  MessageBoxIcon.Question);
+
+            if (result != DialogResult.Yes)
+            {
+                return; // Abbrechen, wenn der Benutzer auf "Nein" klickt.
+            }
             selectedTableName = comboBoxTableName.Text;
             int index = comboBoxTableName.SelectedIndex;
             if (_tableList.Count > 1)
             {
                 _tableList.RemoveAt(index);
                 _tablenames.RemoveAt(index);
+                MessageBox.Show("Die Tabelle " + comboBoxTableName.Text + " wurde gelöscht.", "Erfolg", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else if(_tableList.Count == 1)
             {
@@ -101,12 +115,12 @@ namespace EnzymkinetikAddIn.Forms
                 deleteButton.Enabled = false;
                 comboBoxTableName.Enabled = false;
                 comboBoxTableName.Text = "Kein Eintrag";
-
+                MessageBox.Show("Dies ist die letzte Tabelle. Der Datensatz wird ebenfalls gelöscht.", "Letzte Tabelle", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 DeleteDataset();
             }
             else
             {
-                throw new Exception("Keine Tabellen vorhanden");
+                MessageBox.Show("Es sind keine Tabellen mehr vorhanden. Der Vorgang kann nicht fortgesetzt werden.", "Fehler", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             UpdateTableSelection();
         }
