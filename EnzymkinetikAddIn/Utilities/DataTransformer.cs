@@ -51,7 +51,7 @@ namespace EnzymkinetikAddIn.Utilities
                 else if (columnName.Contains("Verdünnung"))
                 {
                     string number = Char.ToString(columnName.ElementAt(2));
-                    string newColumnName = "Verdünnung " + number;
+                    string newColumnName = "c_" + number + "\nVerdünnung";
                     newTableData.Columns.Add(newColumnName, typeof(double));
                     columnMappings[columnName] = newColumnName;
                 }
@@ -60,7 +60,7 @@ namespace EnzymkinetikAddIn.Utilities
                     char c = columnName.ElementAt(2);
                     char num = columnName.ElementAt(13);
                     string sampleUnit = columnName.Contains("g_L") ? "g/L" : "mg/dL";
-                    string newColumnName = num == '1' ? $"Messwert 1 (c_{c}, {sampleUnit})" : $"Messwert 2 (c_{c}, {sampleUnit})";
+                    string newColumnName = num == '1' ? $"c_{c}\nMesswert 1\n({sampleUnit})" : $"c_{c}\nMesswert 2\n({sampleUnit})";
                     newTableData.Columns.Add(newColumnName, typeof(double));
                     columnMappings[columnName] = newColumnName;
                 }
