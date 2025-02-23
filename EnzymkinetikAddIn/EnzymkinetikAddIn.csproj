@@ -249,6 +249,7 @@
     <Compile Include="Interfaces\IFormGenerator.cs" />
     <Compile Include="Interfaces\IModelLogic.cs" />
     <Compile Include="Managers\DataGridManager.cs" />
+    <Compile Include="Models\BasicAnalysis.cs" />
     <Compile Include="Models\LineweaverBurk.cs" />
     <Compile Include="Models\MichaelisMenten.cs" />
     <Compile Include="Models\RawData.cs" />
