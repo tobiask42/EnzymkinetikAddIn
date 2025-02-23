@@ -514,15 +514,23 @@ namespace EnzymkinetikAddIn.Forms
         {
             foreach (string tableName in tableNames)
             {
-                string cleaned_name = tableName.Replace(_entryName.Replace(" ","_"),String.Empty);
-                cleaned_name = cleaned_name.Replace("_", " ");
-                cleaned_name = cleaned_name.Trim();
-                //MessageBox.Show("EntryName: " + _entryName +"\nBefore Cleaning: " + tableName + "\nAfter Cleaning: " + cleaned_name);
+                string cleaned_name = tableName;
+                if (editMode)
+                {
+                    cleaned_name = tableName.Replace(_entryName.Replace(" ", "_"), String.Empty);
+                    cleaned_name = cleaned_name.Replace("_", " ");
+                    cleaned_name = cleaned_name.Trim();
+                    //MessageBox.Show("EntryName: " + _entryName +"\nBefore Cleaning: " + tableName + "\nAfter Cleaning: " + cleaned_name);
+                }
                 _tablenames.Add(cleaned_name);
             }
             if (_tableList != null)
             {
                 UpdateTableSelection();
+            }
+            else
+            {
+                MessageBox.Show("_tableList ist null (SetTableNames)");
             }
             
         }
