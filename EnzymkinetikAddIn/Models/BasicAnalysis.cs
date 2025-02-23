@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity.ModelConfiguration.Configuration;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using EnzymkinetikAddIn.Interfaces;
 using EnzymkinetikAddIn.Utilities;
 
@@ -16,7 +10,6 @@ namespace EnzymkinetikAddIn.Models
     {
         public Dictionary<string, DataTable> CalculateResult(string entryName)
         {
-            MessageBox.Show("Model: Basic Analysis");
             Dictionary<string, DataTable> rawData = DataTransformer.TransformFromDatabase(entryName);
             Dictionary<string, DataTable> result = new Dictionary<string, DataTable>();
 
@@ -24,20 +17,14 @@ namespace EnzymkinetikAddIn.Models
             {
                 string key = kvp.Key;
                 DataTable data = kvp.Value;
-                int size = data.Columns.Count;
-                // Neue DataTable für Ergebnisse
-                DataTable resultTable = data.Copy();
+                DataTable newTable = data.Copy();
 
-
-
-                int totalColumns = data.Columns.Count;
-                // Gesamtspalten - 4 (Probe, Zeit, erste Verdünnung, Kommentar) geteilt durch 3 ergibt n
-                int numberOfConcentrations = (totalColumns - 4) / 3; 
+                int totalColumns = newTable.Columns.Count;
+                int numberOfConcentrations = (totalColumns - 4) / 3; // Anzahl der Konzentrationen berechnen
 
                 for (int i = 0; i <= numberOfConcentrations; i++)
                 {
-                    int baseIndex = 2 + i * 3; // Startindex für jede Konzentration: Index 2 ist die erste Verdünnung
-
+                    int baseIndex = 2 + i * 3; // Index der ersten Spalte pro Konzentration
                     int verdünnungIndex = baseIndex;
                     int messwert1Index = baseIndex + 1;
                     int messwert2Index = baseIndex + 2;
@@ -46,10 +33,12 @@ namespace EnzymkinetikAddIn.Models
                     string durchschnitt = $"{concentrationLabel} Durchschnitt";
                     string unverdünnt = $"{concentrationLabel} Unverdünnt";
 
-                    resultTable.Columns.Add(durchschnitt, typeof(double));
-                    resultTable.Columns.Add(unverdünnt, typeof(double));
+                    // Spalten hinzufügen
+                    newTable.Columns.Add(durchschnitt, typeof(double));
+                    newTable.Columns.Add(unverdünnt, typeof(double));
 
-                    foreach (DataRow row in resultTable.Rows)
+                    // Berechnungen durchführen
+                    foreach (DataRow row in newTable.Rows)
                     {
                         double mw1 = row[messwert1Index] != DBNull.Value ? Convert.ToDouble(row[messwert1Index]) : double.NaN;
                         double mw2 = row[messwert2Index] != DBNull.Value ? Convert.ToDouble(row[messwert2Index]) : double.NaN;
@@ -60,37 +49,32 @@ namespace EnzymkinetikAddIn.Models
                             ? (double)row[durchschnitt] * dilution
                             : double.NaN;
                     }
+
+                    // Spalten direkt nach den Messwerten verschieben
+                    int insertIndex = baseIndex + 3; // Direkt nach Messwert 2
+                    MoveColumn(newTable, durchschnitt, insertIndex);
+                    MoveColumn(newTable, unverdünnt, insertIndex + 1);
                 }
-                //resultTable = MoveColumns(resultTable, size);
 
-                result[key] = resultTable;
+                result[key] = newTable;
             }
-          return result;
+
+            return result;
         }
 
-        private DataTable MoveColumns(DataTable resultTable, int baseSize)
+        /// <summary>
+        /// Verschiebt eine Spalte an eine bestimmte Position.
+        /// </summary>
+        private void MoveColumn(DataTable table, string columnName, int newPosition)
         {
-            int cGroups = (baseSize - 3) / 3; // cGroups ist die Anzahl der c-Gruppen
-            List<int> from = new List<int>();  // Liste der Spalten, die verschoben werden
-            List<int> to = new List<int>();    // Zielpositionen für die Spalten
-
-            // Durchlaufen der c-Gruppen
-            for (int i = 0; i < cGroups; i++)
+            if (table.Columns.Contains(columnName))
             {
-
+                table.Columns[columnName].SetOrdinal(newPosition);
             }
-
-            // Ausgabe der Indizes vor der Verschiebung zur Kontrolle
-            MessageBox.Show("From: " + string.Join(", ", from.ToArray()) +
-                             "\nTo: " + string.Join(", ", to.ToArray()));
-
-            // Verschieben der Spalten in die richtige Reihenfolge
-            DataTableUtils.MoveColumns(resultTable, from.ToArray(), to.ToArray());
-
-            return resultTable;
+            else
+            {
+                throw new ArgumentException($"Die Spalte '{columnName}' existiert nicht in der Tabelle.");
+            }
         }
-
-
-
     }
 }
