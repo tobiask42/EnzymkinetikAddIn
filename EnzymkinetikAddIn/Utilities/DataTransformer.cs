@@ -43,7 +43,8 @@ namespace EnzymkinetikAddIn.Utilities
                 else if (columnName.Contains("Zeit"))
                 {
                     timeUnit = Char.ToString(columnName.ElementAt(6)) == "m" ? "min" : "s";
-                    string newColumnName = "Zeit (" + timeUnit + ")";
+                    //string newColumnName = "Zeit (" + timeUnit + ")";
+                    string newColumnName = "Zeit (h)"; //Stunde verwenden (vorläufige Vereinfachung)
                     newTableData.Columns.Add(newColumnName, typeof(double));
                     columnMappings[columnName] = newColumnName; // Alt -> Neu
                 }
