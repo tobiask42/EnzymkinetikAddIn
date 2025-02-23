@@ -52,8 +52,8 @@ namespace EnzymkinetikAddIn.Models
 
                     // Spalten direkt nach den Messwerten verschieben
                     int insertIndex = baseIndex + 3; // Direkt nach Messwert 2
-                    MoveColumn(newTable, avg, insertIndex);
-                    MoveColumn(newTable, undiluted, insertIndex + 1);
+                    //MoveColumn(newTable, avg, insertIndex);
+                    //MoveColumn(newTable, undiluted, insertIndex + 1);
                 }
 
                 result[key] = newTable;
