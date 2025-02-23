@@ -18,8 +18,9 @@ namespace EnzymkinetikAddIn.Factories
             _modelRegistry = new Dictionary<string, Func<IModelLogic>>
             {
                 { ModelConstants.Models[0], () => new RawData() },
-                { ModelConstants.Models[1], () => new MichaelisMenten() },
-                { ModelConstants.Models[2], () => new LineweaverBurk() }
+                { ModelConstants.Models[1], () => new BasicAnalysis() },
+                { ModelConstants.Models[2], () => new MichaelisMenten() },
+                { ModelConstants.Models[3], () => new LineweaverBurk() }
             };
         }
 
