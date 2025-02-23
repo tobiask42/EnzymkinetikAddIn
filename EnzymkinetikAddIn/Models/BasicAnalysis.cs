@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity.ModelConfiguration.Configuration;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -23,7 +24,7 @@ namespace EnzymkinetikAddIn.Models
             {
                 string key = kvp.Key;
                 DataTable data = kvp.Value;
-
+                int size = data.Columns.Count;
                 // Neue DataTable für Ergebnisse
                 DataTable resultTable = data.Copy();
 
@@ -60,10 +61,36 @@ namespace EnzymkinetikAddIn.Models
                             : double.NaN;
                     }
                 }
+                //resultTable = MoveColumns(resultTable, size);
 
                 result[key] = resultTable;
             }
           return result;
         }
+
+        private DataTable MoveColumns(DataTable resultTable, int baseSize)
+        {
+            int cGroups = (baseSize - 3) / 3; // cGroups ist die Anzahl der c-Gruppen
+            List<int> from = new List<int>();  // Liste der Spalten, die verschoben werden
+            List<int> to = new List<int>();    // Zielpositionen für die Spalten
+
+            // Durchlaufen der c-Gruppen
+            for (int i = 0; i < cGroups; i++)
+            {
+
+            }
+
+            // Ausgabe der Indizes vor der Verschiebung zur Kontrolle
+            MessageBox.Show("From: " + string.Join(", ", from.ToArray()) +
+                             "\nTo: " + string.Join(", ", to.ToArray()));
+
+            // Verschieben der Spalten in die richtige Reihenfolge
+            DataTableUtils.MoveColumns(resultTable, from.ToArray(), to.ToArray());
+
+            return resultTable;
+        }
+
+
+
     }
 }
