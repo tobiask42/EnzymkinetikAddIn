@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using EnzymkinetikAddIn.Interfaces;
 using EnzymkinetikAddIn.Utilities;
 
@@ -14,6 +15,7 @@ namespace EnzymkinetikAddIn.Models
     {
         public Dictionary<string, DataTable> CalculateResult(string entryName)
         {
+            MessageBox.Show("Model: Basic Analysis");
             Dictionary<string, DataTable> rawData = DataTransformer.TransformFromDatabase(entryName);
             Dictionary<string, DataTable> result = new Dictionary<string, DataTable>();
 
@@ -26,57 +28,39 @@ namespace EnzymkinetikAddIn.Models
                 DataTable resultTable = data.Copy();
 
 
-                // Alle Konzentrationen ermitteln (c_1, c_2, c_3,...,c_n)
-                var concentrationGroups = resultTable.Columns.Cast<DataColumn>()
-                    .Select(c => Regex.Match(c.ColumnName, @"c_(\d+)"))  // Extrahiere c_1, c_2,...,c_n
-                    .Where(m => m.Success)
-                    .Select(m => m.Value)
-                    .Distinct()
-                    .ToList();
 
-                // Für jede Konzentration neue Spalten hinzufügen
-                foreach (string concentration in concentrationGroups)
+                int totalColumns = data.Columns.Count;
+                // Gesamtspalten - 4 (Probe, Zeit, erste Verdünnung, Kommentar) geteilt durch 3 ergibt n
+                int numberOfConcentrations = (totalColumns - 4) / 3; 
+
+                for (int i = 0; i <= numberOfConcentrations; i++)
                 {
-                    string avgColumn = $"{concentration} Durchschnitt";
-                    string undilutedColumn = $"{concentration} Unverdünnt";
+                    int baseIndex = 2 + i * 3; // Startindex für jede Konzentration: Index 2 ist die erste Verdünnung
 
-                    if (!resultTable.Columns.Contains(avgColumn))
-                        resultTable.Columns.Add(avgColumn, typeof(double));
+                    int verdünnungIndex = baseIndex;
+                    int messwert1Index = baseIndex + 1;
+                    int messwert2Index = baseIndex + 2;
 
-                    if (!resultTable.Columns.Contains(undilutedColumn))
-                        resultTable.Columns.Add(undilutedColumn, typeof(double));
-                }
+                    string concentrationLabel = $"c_{i + 1}";
+                    string durchschnitt = $"{concentrationLabel} Durchschnitt";
+                    string unverdünnt = $"{concentrationLabel} Unverdünnt";
 
-                foreach (DataRow row in resultTable.Rows)
-                {
-                    foreach (string concentration in concentrationGroups)
+                    resultTable.Columns.Add(durchschnitt, typeof(double));
+                    resultTable.Columns.Add(unverdünnt, typeof(double));
+
+                    foreach (DataRow row in resultTable.Rows)
                     {
-                        // Verdünnungsfaktor ermitteln
-                        double dilutionFactor = double.NaN;
-                        DataColumn dilutionColumn = resultTable.Columns.Cast<DataColumn>()
-                            .FirstOrDefault(c => Regex.IsMatch(c.ColumnName, $@"{concentration}.*verdünnung", RegexOptions.IgnoreCase));
-                        if (dilutionColumn != null && row[dilutionColumn] != DBNull.Value)
-                        {
-                            dilutionFactor = Convert.ToDouble(row[dilutionColumn]);
-                        }
-                        else
-                        {
-                            dilutionFactor = 1.0;
-                        }
-                        // Messwerte finden und als Liste speichern
-                        var measurementColumns = resultTable.Columns.Cast<DataColumn>()
-                            .Where(c => Regex.IsMatch(c.ColumnName, $@"{concentration}.*messwert", RegexOptions.IgnoreCase))
-                            .ToList();
-                        var measurements = measurementColumns
-                            .Select(c => row[c] != DBNull.Value ? Convert.ToDouble(row[c]):double.NaN)
-                            .Where(v => !double.IsNaN(v))
-                            .ToList();
-                        // Durchschnitt berechnen
-                        double avg = measurements.Any() ? measurements.Average() : double.NaN;
-                        // Unverdünnte Konzentration = Durchschnitt * Verdünnungsfaktor
-                        double undiluted = !double.IsNaN(avg) ? avg * dilutionFactor : double.NaN;
+                        double mw1 = row[messwert1Index] != DBNull.Value ? Convert.ToDouble(row[messwert1Index]) : double.NaN;
+                        double mw2 = row[messwert2Index] != DBNull.Value ? Convert.ToDouble(row[messwert2Index]) : double.NaN;
+                        double dilution = row[verdünnungIndex] != DBNull.Value ? Convert.ToDouble(row[verdünnungIndex]) : double.NaN;
+
+                        row[durchschnitt] = (!double.IsNaN(mw1) && !double.IsNaN(mw2)) ? (mw1 + mw2) / 2 : double.NaN;
+                        row[unverdünnt] = (!double.IsNaN((double)row[durchschnitt]) && !double.IsNaN(dilution))
+                            ? (double)row[durchschnitt] * dilution
+                            : double.NaN;
                     }
                 }
+
                 result[key] = resultTable;
             }
           return result;
