@@ -357,10 +357,13 @@ namespace EnzymkinetikAddIn.Forms
             dataGridViewInputData.Size = _size;
             dataGridViewInputData.Anchor = _anchor;
 
+            dataGridViewInputData.ColumnHeadersHeight = 50;
+
             // Der Liste hinzufügen
             _tableList.Add(dataGridViewInputData);
             string name = checkForDuplicates();
             _tablenames.Add(name);
+
             // In das UI einfügen
             Controls.Add(dataGridViewInputData);
             dataGridViewInputData.BringToFront();
@@ -369,6 +372,8 @@ namespace EnzymkinetikAddIn.Forms
             UpdateTableSelection();
             deleteButton.Enabled = true;
         }
+
+
 
         private string checkForDuplicates()
         {
@@ -422,24 +427,25 @@ namespace EnzymkinetikAddIn.Forms
         {
             if (comboBoxTableName.SelectedIndex >= 0 && comboBoxTableName.SelectedIndex < _tableList.Count)
             {
-
                 // Entferne die aktuell sichtbare Tabelle aus den Controls
                 Controls.Remove(dataGridViewInputData);
 
                 // Wechsle zur gewählten Tabelle aus der Liste
                 dataGridViewInputData = _tableList[comboBoxTableName.SelectedIndex];
 
+                // Gleiche Position, Größe und Anchor übernehmen
                 dataGridViewInputData.Location = _location;
                 dataGridViewInputData.Size = _size;
                 dataGridViewInputData.Anchor = _anchor;
+
+                // Größe der Spalten für die Überschriften setzen
+                dataGridViewInputData.ColumnHeadersHeight = 50;
 
                 // Füge sie zum UI hinzu
                 Controls.Add(dataGridViewInputData);
                 dataGridViewInputData.BringToFront();
             }
         }
-
-
 
         // Speichert alle Tabellen in die Datenbank
         public void SaveAllTablesToDatabase()
