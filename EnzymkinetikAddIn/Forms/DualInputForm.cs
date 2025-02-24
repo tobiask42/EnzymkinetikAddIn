@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace EnzymkinetikAddIn.Forms
@@ -13,13 +9,10 @@ namespace EnzymkinetikAddIn.Forms
         public string EntryName => textBoxEntryName.Text;
         public string TableName => textBoxTableName.Text;
 
-        public DualInputForm(string title, string label1, string label2)
+        public DualInputForm(string title)
         {
             InitializeComponent();
             this.Text = title;
-
-            labelEntryName.Text = label1;
-            labelTableName.Text = label2;
 
             // KeyPress-Events anhängen
             textBoxEntryName.KeyPress += nameTextBox_KeyPress;
@@ -28,24 +21,91 @@ namespace EnzymkinetikAddIn.Forms
 
         private void InitializeComponent()
         {
-            this.textBoxEntryName = new TextBox { Location = new Point(20, 40), Width = 200 };
-            this.textBoxTableName = new TextBox { Location = new Point(20, 100), Width = 200 };
-            this.labelEntryName = new Label { Text = "Datensatzname:", Location = new Point(20, 20) };
-            this.labelTableName = new Label { Text = "Tabellenname:", Location = new Point(20, 80) };
-            this.buttonOK = new Button { Text = "OK", Location = new Point(20, 160), DialogResult = DialogResult.OK };
-            this.buttonCancel = new Button { Text = "Abbrechen", Location = new Point(140, 160), DialogResult = DialogResult.Cancel };
+            // FlowLayoutPanel für die Eingabefelder
+            this.flowLayoutPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                FlowDirection = FlowDirection.TopDown,
+                Padding = new Padding(10),
+                WrapContents = false
+            };
 
-            this.Controls.Add(labelEntryName);
-            this.Controls.Add(textBoxEntryName);
-            this.Controls.Add(labelTableName);
-            this.Controls.Add(textBoxTableName);
-            this.Controls.Add(buttonOK);
-            this.Controls.Add(buttonCancel);
+            // TextBoxen und Labels
+            this.textBoxEntryName = new TextBox
+            {
+                Width = 220,
+                Font = new Font("Segoe UI", 9),
+                Padding = new Padding(5),
+            };
 
+            this.textBoxTableName = new TextBox
+            {
+                Width = 220,
+                Font = new Font("Segoe UI", 9),
+                Padding = new Padding(5),
+            };
+
+            this.labelEntryName = new Label
+            {
+                Text = "Datensatzname:",
+                Font = new Font("Segoe UI", 9)
+            };
+
+            this.labelTableName = new Label
+            {
+                Text = "Tabellenname:",
+                Font = new Font("Segoe UI", 9)
+            };
+
+            this.buttonOK = new Button
+            {
+                Text = "OK",
+                DialogResult = DialogResult.OK,
+                Font = new Font("Segoe UI", 9),
+                BackColor = Color.FromArgb(255, 255, 255),
+                ForeColor = Color.Black
+            };
+
+            this.buttonCancel = new Button
+            {
+                Text = "Abbrechen",
+                DialogResult = DialogResult.Cancel,
+                Font = new Font("Segoe UI", 9),
+                BackColor = Color.FromArgb(255, 255, 255),
+                ForeColor = Color.Black
+            };
+
+            // FlowLayoutPanel für die Buttons
+            this.buttonPanel = new FlowLayoutPanel
+            {
+                FlowDirection = FlowDirection.LeftToRight,  // Buttons nebeneinander anordnen
+                AutoSize = true,
+                Padding = new Padding(10),
+                WrapContents = false
+            };
+
+            // Buttons zum Button-Panel hinzufügen
+            this.buttonPanel.Controls.Add(this.buttonOK);
+            this.buttonPanel.Controls.Add(this.buttonCancel);
+
+            // Steuerelemente zum Eingabe-Panel hinzufügen
+            this.flowLayoutPanel.Controls.Add(this.labelEntryName);
+            this.flowLayoutPanel.Controls.Add(this.textBoxEntryName);
+            this.flowLayoutPanel.Controls.Add(this.labelTableName);
+            this.flowLayoutPanel.Controls.Add(this.textBoxTableName);
+            this.flowLayoutPanel.Controls.Add(this.buttonPanel);  // Button-Panel einfügen
+
+            // FlowLayoutPanel zum Formular hinzufügen
+            this.Controls.Add(this.flowLayoutPanel);
+
+            // Weitere Form-Attribute
             this.AcceptButton = buttonOK;
             this.CancelButton = buttonCancel;
             this.StartPosition = FormStartPosition.CenterParent;
-            this.ClientSize = new Size(250, 220);
+            this.AutoSize = true;
+            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            this.MinimumSize = new Size(250, 220);
         }
 
         private TextBox textBoxEntryName;
@@ -54,6 +114,8 @@ namespace EnzymkinetikAddIn.Forms
         private Label labelTableName;
         private Button buttonOK;
         private Button buttonCancel;
+        private FlowLayoutPanel flowLayoutPanel;
+        private FlowLayoutPanel buttonPanel; // Panel für Buttons
 
         private void nameTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
