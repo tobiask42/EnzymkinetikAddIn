@@ -121,7 +121,7 @@ namespace EnzymkinetikAddIn.Ribbon
 
         private void buttonOpenInputForm_Click(object sender, RibbonControlEventArgs e)
         {
-            var form = new DualInputForm("Neue Dateneingabe", "Bitte Datensatznamen eingeben", "Bitte ersten Tabellennamen angeben");
+            var form = new DualInputForm("Neue Dateneingabe");
             if (form.ShowDialog() == DialogResult.OK)
             {
                 string entryName = form.EntryName;
