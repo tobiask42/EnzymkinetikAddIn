@@ -16,7 +16,7 @@ namespace EnzymkinetikAddIn.Models
     {
         public Dictionary<string, DataTable> CalculateResult(string entryName)
         {
-            MessageBox.Show("Model: Basic Analysis");
+            // MessageBox.Show("Model: Basic Analysis");
             Dictionary<string, DataTable> rawData = DataTransformer.TransformFromDatabase(entryName);
             Dictionary<string, DataTable> result = new Dictionary<string, DataTable>();
 
