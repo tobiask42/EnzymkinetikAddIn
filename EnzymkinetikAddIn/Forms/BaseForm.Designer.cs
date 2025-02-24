@@ -38,7 +38,6 @@
             this.comboBoxTableName = new System.Windows.Forms.ComboBox();
             this.comboBoxConcentration = new System.Windows.Forms.ComboBox();
             this.comboBoxUnit = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.labelConc = new System.Windows.Forms.Label();
             this.labelUnit = new System.Windows.Forms.Label();
             this.labelTables = new System.Windows.Forms.Label();
@@ -133,15 +132,6 @@
             this.comboBoxUnit.Size = new System.Drawing.Size(121, 21);
             this.comboBoxUnit.TabIndex = 8;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(0, 0);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 9;
-            this.label1.Text = "label1";
-            // 
             // labelConc
             // 
             this.labelConc.AutoSize = true;
@@ -193,7 +183,6 @@
             this.Controls.Add(this.labelTables);
             this.Controls.Add(this.labelUnit);
             this.Controls.Add(this.labelConc);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.comboBoxUnit);
             this.Controls.Add(this.comboBoxConcentration);
             this.Controls.Add(this.comboBoxTableName);
@@ -223,7 +212,6 @@
         private System.Windows.Forms.ComboBox comboBoxTableName;
         private System.Windows.Forms.ComboBox comboBoxConcentration;
         private System.Windows.Forms.ComboBox comboBoxUnit;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label labelConc;
         private System.Windows.Forms.Label labelUnit;
         private System.Windows.Forms.Label labelTables;

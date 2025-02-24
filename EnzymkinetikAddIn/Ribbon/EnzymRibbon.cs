@@ -41,6 +41,9 @@ namespace EnzymkinetikAddIn.Ribbon
         private void DisableOptions()
         {
             dropDownUnit.Enabled = false;
+            group1.Label = "";
+            group2.Label = "";
+            group3.Label = "";
            
         }
 
