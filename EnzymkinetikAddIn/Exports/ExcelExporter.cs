@@ -61,7 +61,10 @@ namespace EnzymkinetikAddIn.Exports
                         for (int j = 0; j < table.Columns.Count; j++)
                         {
                             object value = table.Rows[i][j];
-                            worksheet.Cells[currentRow + i, currentCol + j] = value == DBNull.Value ? "" : value;
+                            if (value.ToString().Equals("NaN")){
+                                continue;
+                            }
+                            worksheet.Cells[currentRow + i, currentCol + j] = value;
                         }
                     }
 
