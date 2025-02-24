@@ -17,6 +17,7 @@ namespace EnzymkinetikAddIn.Generators
         {
             // Erstellt ein neues Formular
             BaseForm form = new BaseForm();
+            form.Text = "Datensatz erstellen";
             // Zugriff auf das DataGridView des Formulars
             var dataGridView = form.GetDataGridView();
             ConfigureColumns(dataGridView, concentration, unit);
