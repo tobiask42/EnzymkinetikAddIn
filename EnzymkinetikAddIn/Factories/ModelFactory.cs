@@ -19,8 +19,8 @@ namespace EnzymkinetikAddIn.Factories
             {
                 { ModelConstants.Models[0], () => new RawData() },
                 { ModelConstants.Models[1], () => new BasicAnalysis() },
-                { ModelConstants.Models[2], () => new MichaelisMenten() },
-                { ModelConstants.Models[3], () => new LineweaverBurk() }
+               // { ModelConstants.Models[2], () => new MichaelisMenten() },
+               // { ModelConstants.Models[3], () => new LineweaverBurk() }
             };
         }
 

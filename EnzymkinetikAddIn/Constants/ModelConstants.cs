@@ -19,8 +19,8 @@ namespace EnzymkinetikAddIn.Constants
             {
                 "Rohdaten",
                 "Basisberechnung",
-                "Michaelis-Menten",
-                "Lineweaver-Burk"
+                //"Michaelis-Menten",
+                //"Lineweaver-Burk"
             };
         }
     }
