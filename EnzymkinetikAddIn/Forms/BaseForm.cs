@@ -36,7 +36,7 @@ namespace EnzymkinetikAddIn.Forms
         private readonly Point _location;
         private readonly Size _size;
         private readonly AnchorStyles _anchor;
-        private List<String> _tablenames = new List<String>();
+        private readonly List<String> _tablenames = new List<String>();
         public BaseForm()
         {
             InitializeComponent();
