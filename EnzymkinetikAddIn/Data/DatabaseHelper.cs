@@ -547,77 +547,90 @@ namespace EnzymkinetikAddIn.Data
             using (var conn = GetConnection())
             {
                 conn.Open();
-                List<string> currentTableNames = GetTablesForEntry(entryName);
-                List<string> newTableNames = new List<string>();
-                foreach (string tableName in tableNames)
+                using (var transaction = conn.BeginTransaction())
                 {
-                    string name = tableName.Replace(" ", "_");
-                    name = entryName.Replace(" ", "_") + "_" + name;
-                    newTableNames.Add(name);
-                }
-                var toBeRemoved = currentTableNames.Except(newTableNames).ToList();
-                //MessageBox.Show("EntryName: " + entryName +
-                //    "\nCurrentTableNames: " + string.Join(", ", currentTableNames) +
-                //    "\nNewTableNames: " + string.Join(", ", newTableNames) +
-                //    "\nToBeRemoved: " + string.Join(", ", toBeRemoved));
-
-                foreach (string tableName in toBeRemoved)
-                {
-                    DeleteTableFromDatabase(conn, tableName);
-                }
-
-                // Speichere alle Tabellen, die in tableList sind
-                foreach (var (table, index) in tableList.Select((t, i) => (t, i)))
-                {
-                    string tableName = tableNames[index];
-                    // Speichern der DataGridView in die Datenbank
-                    if (!SaveDataGridViewToDatabase(conn, table, entryName, tableName))
+                    try
                     {
+                        List<string> currentTableNames = GetTablesForEntry(entryName);
+                        List<string> newTableNames = new List<string>();
+                        foreach (string tableName in tableNames)
+                        {
+                            if (!IsValidTableName(tableName))
+                            {
+                                throw new ArgumentException($"Ungültiger Tabellenname: {tableName}");
+                            }
+                            string name = tableName.Replace(" ", "_");
+                            name = entryName.Replace(" ", "_") + "_" + name;
+                            newTableNames.Add(name);
+                        }
+                        var toBeRemoved = currentTableNames.Except(newTableNames).ToList();
+
+                        foreach (string tableName in toBeRemoved)
+                        {
+                            DeleteTableFromDatabase(conn, transaction, tableName);
+                        }
+
+                        // Speichere alle Tabellen, die in tableList sind
+                        foreach (var (table, index) in tableList.Select((t, i) => (t, i)))
+                        {
+                            string tableName = tableNames[index];
+                            // Speichern der DataGridView in die Datenbank
+                            if (!SaveDataGridViewToDatabase(conn, table, entryName, tableName))
+                            {
+                                throw new Exception("Fehler beim Speichern einer Tabelle.");
+                            }
+                        }
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
                         return false;
                     }
                 }
             }
-
-            return true;
         }
 
-        private static void DeleteTableFromDatabase(SQLiteConnection conn, string tableName)
+        private static void DeleteTableFromDatabase(SQLiteConnection conn, SQLiteTransaction transaction, string tableName)
         {
             // Validierung des Tabellennamens, um sicherzustellen, dass keine SQL-Injection möglich ist.
-            if (string.IsNullOrWhiteSpace(tableName) || !Regex.IsMatch(tableName, @"^[a-zA-Z0-9_]+$"))
+            if (!IsValidTableName(tableName))
             {
                 throw new ArgumentException("Ungültiger Tabellenname.");
             }
 
-            using (var transaction = conn.BeginTransaction())
+            try
             {
-                try
+                string dropQuery = $"DROP TABLE \"{tableName}\";";
+
+                using (var dropCmd = new SQLiteCommand(dropQuery, conn, transaction))
                 {
-                    string dropQuery = $"DROP TABLE \"{tableName}\";";
-
-                    using (var dropCmd = new SQLiteCommand(dropQuery, conn, transaction))
-                    {
-                        dropCmd.ExecuteNonQuery();
-                    }
-
-                    string deleteQuery = @"
-                    DELETE FROM EntryTables
-                    WHERE TableName IS @tableName;";
-
-                    using (var deleteCmd = new SQLiteCommand(deleteQuery, conn, transaction))
-                    {
-                        deleteCmd.Parameters.AddWithValue(@"tableName", tableName);
-                        deleteCmd.ExecuteNonQuery();
-                    }
-                    transaction.Commit();
+                    dropCmd.ExecuteNonQuery();
                 }
-                catch (Exception ex)
+
+                string deleteQuery = @"
+                DELETE FROM EntryTables
+                WHERE TableName IS @tableName;";
+
+                using (var deleteCmd = new SQLiteCommand(deleteQuery, conn, transaction))
                 {
-                    transaction.Rollback();
-                    throw ex;
+                    deleteCmd.Parameters.AddWithValue(@"tableName", tableName);
+                    deleteCmd.ExecuteNonQuery();
                 }
+                transaction.Commit();
             }
-            
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
+
+        private static bool IsValidTableName(string tableName)
+        {
+            return !string.IsNullOrWhiteSpace(tableName) // Kein leerer String oder nur Leerzeichen
+                && Regex.IsMatch(tableName, @"^[a-zA-Z][a-zA-Z0-9_]*$"); // Muss mit Buchstaben beginnen
         }
     }
 }
