@@ -24,8 +24,7 @@ namespace EnzymkinetikAddIn.Generators
             form.Text = "Datensatz Bearbeiten";
             List<string> tablenames = DatabaseHelper.GetTableNamesByEntryName(entryName);
             form.SetTableNames(tablenames);
-            form.Name = entryName;
-            DataGridView baseDataGridView = form.GetDataGridView();            
+            form.Name = entryName;           
             List<DataGridView> dataGridViews = dataGridManager.GetDataGridViews(tables);
             form.SetTableList(dataGridViews);
             
