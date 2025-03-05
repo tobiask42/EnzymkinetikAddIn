@@ -74,7 +74,7 @@
             this.comboBoxTimeUnit.Name = "comboBoxTimeUnit";
             this.comboBoxTimeUnit.Size = new System.Drawing.Size(121, 21);
             this.comboBoxTimeUnit.TabIndex = 2;
-            this.comboBoxTimeUnit.SelectedIndexChanged += new System.EventHandler(this.comboBoxTimeUnit_SelectedIndexChanged);
+            this.comboBoxTimeUnit.SelectedIndexChanged += new System.EventHandler(this.ComboBoxTimeUnit_SelectedIndexChanged);
             // 
             // nameTextBox
             // 
@@ -83,7 +83,7 @@
             this.nameTextBox.Name = "nameTextBox";
             this.nameTextBox.Size = new System.Drawing.Size(100, 20);
             this.nameTextBox.TabIndex = 3;
-            this.nameTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.nameTextBox_KeyPress);
+            this.nameTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.NameTextBox_KeyPress);
             // 
             // saveButton
             // 
@@ -94,7 +94,7 @@
             this.saveButton.TabIndex = 4;
             this.saveButton.Text = "Datensatz Speichern";
             this.saveButton.UseVisualStyleBackColor = true;
-            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            this.saveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
             // deleteButton
             // 
@@ -114,7 +114,7 @@
             this.comboBoxTableName.Name = "comboBoxTableName";
             this.comboBoxTableName.Size = new System.Drawing.Size(121, 21);
             this.comboBoxTableName.TabIndex = 6;
-            this.comboBoxTableName.SelectedIndexChanged += new System.EventHandler(this.comboBoxTableName_SelectedIndexChanged);
+            this.comboBoxTableName.SelectedIndexChanged += new System.EventHandler(this.ComboBoxTableName_SelectedIndexChanged);
             // 
             // comboBoxConcentration
             // 
@@ -124,7 +124,7 @@
             this.comboBoxConcentration.Name = "comboBoxConcentration";
             this.comboBoxConcentration.Size = new System.Drawing.Size(121, 21);
             this.comboBoxConcentration.TabIndex = 7;
-            this.comboBoxConcentration.SelectedIndexChanged += new System.EventHandler(this.comboBoxConcentration_SelectedIndexChanged);
+            this.comboBoxConcentration.SelectedIndexChanged += new System.EventHandler(this.ComboBoxConcentration_SelectedIndexChanged);
             // 
             // comboBoxUnit
             // 
@@ -176,7 +176,7 @@
             this.tableSaveButton.TabIndex = 13;
             this.tableSaveButton.Text = "Tabelle hinzufügen";
             this.tableSaveButton.UseVisualStyleBackColor = true;
-            this.tableSaveButton.Click += new System.EventHandler(this.tableSaveButton_Click);
+            this.tableSaveButton.Click += new System.EventHandler(this.TableSaveButton_Click);
             // 
             // BaseForm
             // 

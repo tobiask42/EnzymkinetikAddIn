@@ -279,7 +279,7 @@ namespace EnzymkinetikAddIn.Forms
 
 
 
-        private void comboBoxTimeUnit_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBoxTimeUnit_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (_comboBoxManager == null) return;
 
@@ -313,7 +313,7 @@ namespace EnzymkinetikAddIn.Forms
             return dataGridViewInputData;
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private void SaveButton_Click(object sender, EventArgs e)
         {
             try
             {
@@ -329,7 +329,7 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
-        private void tableSaveButton_Click(object sender, EventArgs e)
+        private void TableSaveButton_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(nameTextBox.Text))
             {
@@ -359,7 +359,7 @@ namespace EnzymkinetikAddIn.Forms
 
             // Der Liste hinzufügen
             _tableList.Add(dataGridViewInputData);
-            string name = checkForDuplicates();
+            string name = CheckForDuplicates();
             _tablenames.Add(name);
 
             // In das UI einfügen
@@ -373,7 +373,7 @@ namespace EnzymkinetikAddIn.Forms
 
 
 
-        private string checkForDuplicates()
+        private string CheckForDuplicates()
         {
             string input = nameTextBox.Text;
             string unique_string = input;
@@ -421,7 +421,7 @@ namespace EnzymkinetikAddIn.Forms
 
 
         // Wechselt zwischen gespeicherten Tabellen
-        private void comboBoxTableName_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBoxTableName_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBoxTableName.SelectedIndex >= 0 && comboBoxTableName.SelectedIndex < _tableList.Count)
             {
@@ -467,7 +467,7 @@ namespace EnzymkinetikAddIn.Forms
             _ribbon = ribbon;
         }
 
-        private void nameTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        private void NameTextBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             // Verhindert, dass der Name mit einer Zahl oder einem Leerzeichen beginnt
             if ((nameTextBox.TextLength == 0 && (char.IsDigit(e.KeyChar) || e.KeyChar == ' ')))
@@ -486,17 +486,17 @@ namespace EnzymkinetikAddIn.Forms
             }
         }
 
-        public void showDeleteButton(bool showDelete)
+        public void ShowDeleteButton(bool showDelete)
         {
             deleteButton.Visible = showDelete;
         }
 
-        public void setSelectedTableName(string tableName)
+        public void SetSelectedTableName(string tableName)
         {
             selectedTableName = tableName;
         }
 
-        public string getSelectedTableName()
+        public string GetSelectedTableName()
         {
             return selectedTableName;
         }
@@ -512,7 +512,7 @@ namespace EnzymkinetikAddIn.Forms
             _entryName = entryName;
         }
 
-        private void comboBoxConcentration_SelectedIndexChanged(object sender, EventArgs e)
+        private void ComboBoxConcentration_SelectedIndexChanged(object sender, EventArgs e)
         {
             _selectedConcentration = comboBoxConcentration.Text;
         }
