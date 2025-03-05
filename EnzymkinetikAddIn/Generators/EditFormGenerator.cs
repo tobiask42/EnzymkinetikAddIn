@@ -19,7 +19,7 @@ namespace EnzymkinetikAddIn.Generators
         {
             DataGridManager dataGridManager = new DataGridManager();
             BaseForm form = new BaseForm();
-            form.setEditMode(true);
+            form.SetEditMode(true);
             form.SetEntryName(entryName);
             form.Text = "Datensatz Bearbeiten";
             List<string> tablenames = DatabaseHelper.GetTableNamesByEntryName(entryName);

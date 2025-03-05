@@ -13,9 +13,6 @@ namespace EnzymkinetikAddIn.Data
     {
         private static string _connectionString = string.Empty;
 
-        public static string StorageName { get; private set; }
-
-
         // Datenbankverbindungs-String initialisieren
         public static void InitializeDatabaseConnection(bool isDebugMode, string databaseName)
         {
@@ -64,7 +61,7 @@ namespace EnzymkinetikAddIn.Data
             {
                 try
                 {
-                    CreateTable(conn, dgv, tableName, entryId); // entryId anstelle von entryName übergeben
+                    CreateTable(conn, dgv, tableName);
                     InsertRows(conn, dgv, tableName, entryId);  // entryId anstelle von entryName übergeben
                     SaveTableName(conn, entryId, tableName);    // entryId anstelle von entryName übergeben
                     transaction.Commit();
@@ -79,32 +76,8 @@ namespace EnzymkinetikAddIn.Data
             }
         }
 
-
-
-        public static void DeleteTableFromDatabase(SQLiteConnection conn, string entryName, string tableSuffix)
-        {
-            string tableName = $"{entryName}_{tableSuffix}".Replace(" ", "_");
-
-            using (var cmd = new SQLiteCommand($"DROP TABLE IF EXISTS [{tableName}]", conn))
-            {
-                cmd.ExecuteNonQuery();
-            }
-
-            // Entferne den Tabellennamen aus EntryTables
-            using (var cmd = new SQLiteCommand($"DELETE FROM EntryTables WHERE TableName = @tableName", conn))
-            {
-                cmd.Parameters.AddWithValue("@tableName", tableName);
-                cmd.ExecuteNonQuery();
-            }
-        }
-
-
-
-
-
-
         // Tabelle mit den Spalten aus DataGridView erstellen
-        private static void CreateTable(SQLiteConnection conn, DataGridView dgv, string tableName, int entryId)
+        private static void CreateTable(SQLiteConnection conn, DataGridView dgv, string tableName)
         {
             // Prüfen, ob die Tabelle existiert und gegebenenfalls löschen
             string checkIfTableExistsQuery = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}'";
@@ -218,29 +191,6 @@ namespace EnzymkinetikAddIn.Data
             if (value is bool boolVal) return boolVal ? 1 : 0;
             if (value is DateTime dateVal) return dateVal.ToString("yyyy-MM-dd HH:mm:ss");
             return value;
-        }
-
-        // Alle Tabellennamen abfragen
-        public static List<string> GetTableNames()
-        {
-            List<string> tableNames = new List<string>();
-
-            using (var conn = GetConnection())
-            {
-                conn.Open();
-                string query = "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'";
-
-                using (var cmd = new SQLiteCommand(query, conn))
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        tableNames.Add(reader.GetString(0));
-                    }
-                }
-            }
-
-            return tableNames;
         }
 
         // Tabelle laden und zurückgeben

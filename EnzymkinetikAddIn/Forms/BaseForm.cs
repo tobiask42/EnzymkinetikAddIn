@@ -23,7 +23,6 @@ namespace EnzymkinetikAddIn.Forms
     /// </summary>
     public partial class BaseForm : Form
     {
-        private DataGridManager _dataGridManager;
         private string currentTimeUnit = "";
         private EnzymRibbon _ribbon;
         private string selectedTableName = "";
@@ -37,7 +36,6 @@ namespace EnzymkinetikAddIn.Forms
         private readonly Point _location;
         private readonly Size _size;
         private readonly AnchorStyles _anchor;
-        private InputFormGenerator _inputFormGenerator;
         private List<String> _tablenames = new List<String>();
         public BaseForm()
         {
@@ -503,7 +501,7 @@ namespace EnzymkinetikAddIn.Forms
             return selectedTableName;
         }
 
-        public void setEditMode(bool editMode)
+        public void SetEditMode(bool editMode)
         {
             this.editMode = editMode;
         }
