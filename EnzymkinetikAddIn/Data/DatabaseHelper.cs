@@ -533,7 +533,7 @@ namespace EnzymkinetikAddIn.Data
                         transaction.Commit();
                         return true;
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         transaction.Rollback();
                         return false;
@@ -570,7 +570,7 @@ namespace EnzymkinetikAddIn.Data
                 }
                 transaction.Commit();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 transaction.Rollback();
                 throw;
