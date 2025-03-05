@@ -101,15 +101,16 @@ namespace EnzymkinetikAddIn.Data
 
             // SQL-Query zum Erstellen der Tabelle
             string createTableQuery = $@"
-    CREATE TABLE {tableName} (
-        ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        EntryID INTEGER NOT NULL,
-        {columnDefinitions},
-        FOREIGN KEY (EntryID) REFERENCES Entries(ID) ON DELETE CASCADE
-    );";
+                CREATE TABLE @tablename (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    EntryID INTEGER NOT NULL,
+                    {columnDefinitions},
+                    FOREIGN KEY (EntryID) REFERENCES Entries(ID) ON DELETE CASCADE
+                );";
 
             using (var cmd = new SQLiteCommand(createTableQuery, conn))
             {
+                cmd.Parameters.AddWithValue("@tablename", tableName);
                 cmd.ExecuteNonQuery(); // Tabelle erstellen
             }
         }
