@@ -588,15 +588,36 @@ namespace EnzymkinetikAddIn.Data
             {
                 throw new ArgumentException("Ungültiger Tabellenname.");
             }
-            string dropQuery = @"
-            DROP TABLE {tableName};
-            DELETE FROM EntryTables
-            WHERE TableName IS @tableName;";
-            using (var dropCmd = new SQLiteCommand(dropQuery, conn))
+
+            using (var transaction = conn.BeginTransaction())
             {
-                dropCmd.Parameters.AddWithValue(@"tableName", tableName);
-                dropCmd.ExecuteNonQuery();
+                try
+                {
+                    string dropQuery = $"DROP TABLE \"{tableName}\";";
+
+                    using (var dropCmd = new SQLiteCommand(dropQuery, conn, transaction))
+                    {
+                        dropCmd.ExecuteNonQuery();
+                    }
+
+                    string deleteQuery = @"
+                    DELETE FROM EntryTables
+                    WHERE TableName IS @tableName;";
+
+                    using (var deleteCmd = new SQLiteCommand(deleteQuery, conn, transaction))
+                    {
+                        deleteCmd.Parameters.AddWithValue(@"tableName", tableName);
+                        deleteCmd.ExecuteNonQuery();
+                    }
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw ex;
+                }
             }
+            
         }
     }
 }
